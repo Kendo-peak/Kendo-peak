@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2af1c83f-ae60-4b8c-b3c2-7701155a7184" name="Default" comment="" />
+    <list default="true" id="2af1c83f-ae60-4b8c-b3c2-7701155a7184" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java" afterPath="$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,12 +49,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1863">
-              <caret line="69" column="60" lean-forward="false" selection-start-line="69" selection-start-column="60" selection-end-line="69" selection-end-column="60" />
-              <folding />
+            <state relative-caret-position="481">
+              <caret line="66" column="20" lean-forward="false" selection-start-line="66" selection-start-column="20" selection-end-line="66" selection-end-column="20" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -60,7 +65,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/service/ExportService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="351">
-              <caret line="13" column="19" lean-forward="false" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+              <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -88,7 +93,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
@@ -166,10 +171,11 @@
         <option value="$PROJECT_DIR$/src/main/java/service/impl/exportServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/service/exportService.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java" />
         <option value="$PROJECT_DIR$/src/main/java/util/Utils.java" />
         <option value="$PROJECT_DIR$/src/main/java/service/impl/ExportServiceImpl.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/main/java/service/ExportService.java" />
+        <option value="$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java" />
       </list>
     </option>
   </component>
@@ -874,7 +880,7 @@
       <option name="presentableId" value="Default" />
       <updated>1575440736082</updated>
       <workItem from="1575440738445" duration="8066000" />
-      <workItem from="1575450052720" duration="1690000" />
+      <workItem from="1575450052720" duration="2788000" />
     </task>
     <task id="LOCAL-00001" summary="yh-exportExcel">
       <created>1575450208051</created>
@@ -887,10 +893,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9756000" />
+    <option name="totallyTimeSpent" value="10854000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -906,7 +913,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25305623" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25305623" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -957,7 +964,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="yh-exportExcel" />
-    <option name="LAST_COMMIT_MESSAGE" value="yh-exportExcel" />
+    <MESSAGE value="第二次" />
+    <option name="LAST_COMMIT_MESSAGE" value="第二次" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -998,7 +1006,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1863">
           <caret line="69" column="60" lean-forward="false" selection-start-line="69" selection-start-column="60" selection-end-line="69" selection-end-column="60" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1102,7 +1112,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="5" column="42" lean-forward="true" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1154,6 +1166,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="624">
           <caret line="139" column="9" lean-forward="false" selection-start-line="139" selection-start-column="9" selection-end-line="139" selection-end-column="9" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1218,22 +1231,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1863">
-          <caret line="69" column="60" lean-forward="false" selection-start-line="69" selection-start-column="60" selection-end-line="69" selection-end-column="60" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/service/ExportService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="13" column="19" lean-forward="false" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/service/impl/ExportServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="320">
@@ -1257,6 +1254,24 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/service/ExportService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/socket/nettyServer/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="481">
+          <caret line="66" column="20" lean-forward="false" selection-start-line="66" selection-start-column="20" selection-end-line="66" selection-end-column="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
