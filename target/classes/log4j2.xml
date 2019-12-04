@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+	<appenders>
+		<Console name="all" target="SYSTEM_OUT">
+			<ThresholdFilter level="WARN" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
+		</Console>
+		
+		<RollingFile name="info" fileName="/home/jigou/dmPay/log/normal/info.log"
+			filePattern="/home/jigou/dmPay/log/normal/$${date:yyyy-MM-dd}/info-%d{yyyy-MM-dd-HH_mm_ss}-%i.log.gz">
+		<!--<RollingFile name="info" fileName="log/normal/info.log"
+			filePattern="log/normal/$${date:yyyy-MM-dd}/info-%d{yyyy-MM-dd-HH_mm_ss}-%i.log.gz">-->
+			<PatternLayout pattern="[Time]:[%d{yyyy-MM-dd HH:mm:ss}]%n%msg%xEx%n" />
+			<SizeBasedTriggeringPolicy size="2MB" />
+			<DefaultRolloverStrategy max="1000" />
+			<Filters>
+				<ThresholdFilter level="fatal" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="error" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="warn" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="info" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		
+		<!--<RollingFile name="Err" fileName="log/error/Exp/err.log"
+			filePattern="log/error/Exp/err-%d{yyyy-MM-dd-HH_mm_ss}-%i.log">-->
+		<RollingFile name="Err" fileName="/home/jigou/dmPay/log/error/Exp/err.log"
+			filePattern="/home/jigou/dmPay/log/error/Exp/err-%d{yyyy-MM-dd-HH_mm_ss}-%i.log">
+			<PatternLayout
+				pattern="[Time]:[%d{yyyy-MM-dd HH:mm:ss}]%n[Level]:[%level]%n[Class]:[%class{36}]%n[Line]:[%L]%n[Method]:[%M]%n%msg%xEx%n" />
+			<SizeBasedTriggeringPolicy size="2MB" />
+			<DefaultRolloverStrategy max="1000" />
+			<Filters>
+				<ThresholdFilter level="fatal" onMatch="DENY"
+					onMismatch="NEUTRAL" />
+				<ThresholdFilter level="error" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		
+	</appenders>
+	<loggers>
+		<root level="all">  
+           <appender-ref ref="info" />
+			<appender-ref ref="Err" />
+        </root> 
+	</loggers>
+</configuration>

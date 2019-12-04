@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<c3p0-config>
+	<named-config name="data1">
+		<!--<property name="user">lfb_web</property>
+		<property name="password">lfb_web</property>-->
+		<property name="user">web_db</property>
+		<property name="password">oracle</property>
+		<property name="driverClass">oracle.jdbc.driver.OracleDriver</property>
+		<property name="jdbcUrl">jdbc:oracle:thin:@//192.168.1.70:1521/dba</property>
+		<!--<property name="jdbcUrl">jdbc:oracle:thin:@192.168.1.49:1521:orcl</property>-->
+		<property name="initialPoolSize">10</property>
+		<property name="maxIdleTime">1800</property>
+		<property name="maxPoolSize">100</property>
+		<property name="minPoolSize">10</property>
+		<property name="acquireRetryAttempts">5</property>
+		<property name="maxIdleTimeExcessConnections">20</property>
+		<property name="checkoutTimeout">5000</property>
+		<property name="acquireRetryDelay">1000</property>
+		<property name="autoCommitOnClose">false</property>
+		<property name="numHelperThreads">3</property>
+		<property name="idleConnectionTestPeriod">60</property>
+	</named-config>
+</c3p0-config> 
