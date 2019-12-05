@@ -1,14 +1,13 @@
 package service.impl;
 
 import dao.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import service.ExportService;
+import sqlsession.MySqlSession;
 import task.ExportExcel;
 import task.IncrementLogDownloadTask;
 import util.Utils;
 
-import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +18,11 @@ import java.util.Map;
  * @description: TODO
  * @date 2019/12/416:18
  */
-@Service
 public class ExportServiceImpl implements ExportService {
-    @Resource
-    private UserDao userDao;
-    @Autowired
-    private IncrementLogDownloadTask task;
+
+    private MySqlSession mySqlSession = new MySqlSession();
+
+    private IncrementLogDownloadTask task = new IncrementLogDownloadTask();
 
     /**
      *
@@ -39,7 +37,7 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     @Override
-    public boolean increaseExcel(List reqList){
+    public boolean increaseExcel(List<LinkedHashMap<String,String>> reqList){
         Map map=null;
         try {
             //判断导出什么表 查相对应的sql
@@ -80,7 +78,7 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private List<Map<String,Object>> findListByExcel(List reqList){
+    private List<Map<String,Object>> findListByExcel(List reqList) throws IOException {
         //list中0下标是检索条件
         Map<String,Object> map = (Map)reqList.get(0);
         int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
@@ -90,7 +88,8 @@ public class ExportServiceImpl implements ExportService {
                 //查数据
                 System.out.println(operator_type);
                 System.out.println(map);
-                List<Map<String, Object>> list = userDao.distributionDetailsExportExcel(map);
+                List<Map<String, Object>> list = mySqlSession.getDao(UserDao.class).distributionDetailsExportExcel(map);
+                mySqlSession.destroy();
                 //处理数据
                 Utils.dealCard(list);
                 List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
@@ -127,9 +126,9 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private LinkedHashMap<String, String> createTitileMap(List reqList){
+    private LinkedHashMap<String, String> createTitileMap(List<LinkedHashMap<String,String>> reqList){
         //1下标是表头
-        LinkedHashMap<String, String> titleMap=(LinkedHashMap<String, String>)reqList.get(1);
+        LinkedHashMap<String, String> titleMap=reqList.get(1);
         return titleMap;
     }
     /**

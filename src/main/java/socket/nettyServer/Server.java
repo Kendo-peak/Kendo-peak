@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
 import service.ExportService;
 import service.impl.ExportServiceImpl;
 import socket.BaseIO;
@@ -17,13 +15,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SuppressWarnings("all")
-@Component
 public class Server extends BaseIO {
 	private static Logger log= LogManager.getLogger(Server.class.getName());
 	private ServerSocket serverSocket;
@@ -73,7 +71,7 @@ public class Server extends BaseIO {
 					pack = loFunction.byte2HexStr(bb);
 					pack = loFunction.bytesToString(bb, 0, len,len, "UTF-8");
 					//json转成list
-					List<Map<String,Object>> reqList = JSON.parseObject(pack,new TypeReference<List<Map<String,Object>>>(){});
+					List<LinkedHashMap<String,String>> reqList = JSON.parseObject(pack,new TypeReference<List<LinkedHashMap<String,String>>>(){});
 					//生成excel
 					System.out.println(reqList);
 					ExportService es=new ExportServiceImpl();

@@ -1,15 +1,12 @@
 package task;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.stereotype.Component;
 import util.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -20,7 +17,6 @@ import java.util.Map;
  * @description: TODO
  * @date 2019/12/416:18
  */
-@Component
 public class IncrementLogDownloadTask {
     public boolean downList(Map<String, Object> wb,String fileName,String createMan,String operator_type) throws Exception {
         Map responseMap = new HashMap(16);
