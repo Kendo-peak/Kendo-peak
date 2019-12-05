@@ -1,8 +1,10 @@
 package service.impl;
 
 import service.ExportService;
+import task.ExportExcel;
 import task.IncrementLogDownloadTask;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 /**
@@ -14,6 +16,7 @@ import java.util.Map;
  */
 public class ExportServiceImpl implements ExportService {
     IncrementLogDownloadTask task=new IncrementLogDownloadTask();
+    ExportExcel exportExcel=new ExportExcel();
     /**
      *
      *********************************************************.<br>
@@ -32,7 +35,7 @@ public class ExportServiceImpl implements ExportService {
             //判断导出什么表 查相对应的sql
             List<Map<String,Object>> dataList=findListByExcel(map);
             //生成表头
-            Map<String,String> titileMap=createTitileMap(map);
+            LinkedHashMap<String, String> titileMap=createTitileMap(map);
             //生成文件名
             String fileName=createFileName(map);
             //创建人
@@ -40,7 +43,9 @@ public class ExportServiceImpl implements ExportService {
             //操作类型
             String operator_type=String.valueOf(map.get("operator_type"));
             //根据数据生成excel文件
-            boolean flag = task.downList(dataList, titileMap, fileName,createMan,operator_type);
+            Map<String, Object> wb=null;
+            wb = ExportExcel.exportListExcelClearExcel(wb, dataList, titileMap, fileName);
+            boolean flag = task.downList(wb,fileName,createMan,operator_type);
             return flag==true ? true:false;
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,7 +66,29 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     private List<Map<String,Object>> findListByExcel(Map map){
-
+        int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
+        switch (operator_type){
+            case 18:
+                //代理商分润明细导出
+                break;
+            case 19:
+                //代理商交易明细导出
+                break;
+            case 24:
+                //代理商激活返现明细导出
+                break;
+            case 21:
+                //代理商终端明细导出
+                break;
+            case 22:
+                //代理商流量卡返现明细导出
+                break;
+            case 23:
+                //代理商刷卡达标明细导出
+                break;
+           default:
+               break;
+        }
         return null;
     }
     /**
@@ -76,7 +103,7 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private Map<String,String> createTitileMap(Map map){
+    private LinkedHashMap<String, String> createTitileMap(Map map){
         return null;
     }
     /**

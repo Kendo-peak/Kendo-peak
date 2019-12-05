@@ -183,4 +183,54 @@ public class Utils {
 
         return file;
     }
+
+
+    /**
+     * 判断一个Object 是否能转数字
+     * @param obj
+     * @return boolean
+     */
+    public static boolean isNumber (Object obj) {
+        if (obj == null){
+            return false;
+        }
+        if (obj instanceof Number) {
+            return true;
+        } else if (obj instanceof String){
+            try{
+                Double.parseDouble((String)obj);
+                return true;
+            }catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * String null 转 ""
+     * @param obj
+     * @return boolean
+     */
+    public static String castStringNullToEmpty(String value) {
+        if (value == null || "null".equals(toLowerCase(value))){
+            value = "";
+        }
+        return value;
+    }
+
+    //将字符串中大写字母转小写字母
+    public static String toLowerCase(String str) {
+        char[] s=str.toCharArray();
+        for(int i=0;i<s.length;i++){
+            if(s[i]>='A' && s[i]<='Z'){
+                s[i]+=32;
+            }
+        }
+        str="";
+        for(int j=0;j<s.length;j++){
+            str+=s[j];
+        }
+        return str;
+    }
 }
