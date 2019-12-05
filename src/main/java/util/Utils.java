@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wuhaotai
@@ -74,7 +75,58 @@ public class Utils {
         return date;
     }
 
-
+    //卡号脱敏
+    public static void dealCard(List<Map<String, Object>> objList){
+        for (Map<String, Object> tmpMap : objList){
+            Object panObj=tmpMap.get("PAN");
+            if (panObj!=null && !"".equals(panObj.toString())){
+                String panStr=panObj.toString().substring(0,6)+"******"+panObj.toString().substring(panObj.toString().length()-4);
+                tmpMap.put("PAN",panStr);
+            }
+        }
+    }
+    //处理代理商分润的字段
+    public static List<Map<String, Object>> distributionDetailsList(List list){
+        List<Map<String, Object>> dataList=new ArrayList();
+        for (Object o:list){
+            Map map=(Map)o;
+            //处理商户类别
+            if ("".equals(String.valueOf(map.get("MER_CATEGORY")))||map.get("MER_CATEGORY")!=null){
+                if("0".equals(String.valueOf(map.get("MER_CATEGORY")))){
+                    map.put("MER_CATEGORY","普通商户");
+                }
+                if("1".equals(String.valueOf(map.get("MER_CATEGORY")))){
+                    map.put("MER_CATEGORY","vip商户");
+                }
+            }else {
+                map.put("MER_CATEGORY","暂无");
+            }
+            //卡类型
+            if ("".equals(String.valueOf(map.get("CARD_TYPE")))||map.get("CARD_TYPE")!=null){
+                if ("1".equals(String.valueOf(map.get("CARD_TYPE")))){
+                    map.put("CARD_TYPE","借记卡");
+                }
+                if ("2".equals(String.valueOf(map.get("CARD_TYPE")))){
+                    map.put("CARD_TYPE","贷记卡");
+                }
+            }else {
+                map.put("CARD_TYPE","暂无");
+            }
+            //结算方式
+            if ("".equals(String.valueOf(map.get("SETTLE_METHOD")))||map.get("SETTLE_METHOD")!=null){
+                if ("0".equals(String.valueOf(map.get("SETTLE_METHOD")))){
+                    map.put("SETTLE_METHOD","D0");
+                }
+                if ("1".equals(String.valueOf(map.get("SETTLE_METHOD")))){
+                    map.put("SETTLE_METHOD","T1");
+                }
+            }else {
+                map.put("SETTLE_METHOD","暂无");
+            }
+            dataList.add(map);
+        }
+        return dataList;
+    }
     /**
      * @Author: gxg
      * @Date: 2019/11/18 10:38

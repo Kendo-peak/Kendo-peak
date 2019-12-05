@@ -8,6 +8,8 @@
 
     <cotext:component-scan base-package="service.impl"/>
 
+    <cotext:component-scan base-package="task"/>
+
     <cotext:property-placeholder location="jdbc.properties"/>
 
 </beans>

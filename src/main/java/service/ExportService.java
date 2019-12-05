@@ -1,5 +1,6 @@
 package service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,5 +12,5 @@ import java.util.Map;
  */
 public interface ExportService {
     //生成表文件
-    public boolean increaseExcel(Map map) throws Exception;
+    public boolean increaseExcel(List reqList) throws Exception;
 }

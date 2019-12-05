@@ -1,6 +1,7 @@
 package socket.nettyServer;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import service.ExportService;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,21 +55,26 @@ public class Server extends BaseIO {
 					input = socket.getInputStream();
 					output = socket.getOutputStream();
 					socket.setSoTimeout(30000);
-					byte[] lenByte = new byte[2];
-					input.read(lenByte, 0, 2);
-					int len = (int) loFunction.byteArrayToShort(lenByte);
+//					byte[] lenByte = new byte[2];
+//					input.read(lenByte, 0, 2);
+					//int len = (int) loFunction.byteArrayToShort(lenByte);
+					int len = 0;
+					while (len == 0) {
+						len = input.available();
+					}
 					byte[] bb = new byte[len];
-					int rdLen = input.read(bb, 0, len);
+					int rdLen = input.read(bb, 0, 2);
 					while(rdLen < len){//如果数据不等于实际长度则继续读取
 						rdLen += input.read(bb, rdLen, input.available());
 					}
 					pack = loFunction.byte2HexStr(bb);
 					pack = loFunction.bytesToString(bb, 0, len,len, "UTF-8");
-					//json转成Map
-					Map reqMap = JSON.parseObject(pack);
+					//json转成list
+					List<Map<String,Object>> reqList = JSON.parseObject(pack,new TypeReference<List<Map<String,Object>>>(){});
 					//生成excel
+					System.out.println(reqList);
 					ExportService es=new ExportServiceImpl();
-					boolean flag = es.increaseExcel(reqMap);
+					boolean flag = es.increaseExcel(reqList);
 					//上传excel
 
 

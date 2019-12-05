@@ -8,4 +8,92 @@
         from jobtask
     </select>
 
+    <!-- 代理商分润明细导出 -->
+    <select id="distributionDetailsExportExcel" parameterType="map" resultType="map">
+        select serial,
+        pd.localdate,
+        pd.localtime,
+        pd.merno,
+        pd.mer_name,
+        pd. mer_category,
+        pd.card_type,
+        pd.settle_method,
+        pd.amount,
+        pd.mer_charge,
+        pd.surcharge_charge,
+        pd.settle_ratio,
+        pd.surcharge_ratio,
+        pd.charge_profit,
+        pd.surcharge_profit,
+        pd.createdate,
+        pd.createtime,
+        pd.pan,
+        pd.money,
+        pd.profit_agent_num,
+        pd.profit_agent_name,
+        pd.posno,
+        pd.charge_profit_below,
+        pd.surcharge_profit_below,
+        pd.agent_level,
+        pd.level_tax,
+        pd.below_tax,
+        pd.tax,
+        pd.level_tax_profit,
+        pd.below_tax_profit,
+        pd.profit_tax_diff,
+        pd.pos_type
+        from PROFIT_DETAILED pd
+        left join agent_info ai
+        on pd.PROFIT_AGENT_NUM=ai.agent_num
+        <where>
+            ( ai.AGENT_LEVEL=-1 or (ai.AGENT_LEVEL>-1 and ai.BELONG_AGENT=0))
+            and pos_type = '0'
+            and quick_pay = '1'
+            <!--机构编号-->
+            <if test="agentnum != null and agentnum != ''">
+                and pd.profit_agent_num = #{agentnum}
+            </if>
+            <!--机构名称 -->
+            <if test="agent_name != null and agent_name != ''">
+                and pd.profit_agent_name like '%'||#{agent_name}||'%'
+            </if>
+            <!--商户编号-->
+            <if test="merno != null and merno != ''">
+                and pd.merno = #{merno}
+            </if>
+            <!--商户名称-->
+            <if test="mer_name != null and mer_name != ''">
+                and pd.mer_name = #{mer_name}
+            </if>
+            <!--POS编号-->
+            <if test="pos_sn != null and pos_sn != ''">
+                and pd.posno = #{pos_sn}
+            </if>
+            <!--交易卡号-->
+            <if test="pan != null and pan != ''">
+                and pd.pan = #{pan}
+            </if>
+            <!--卡类型-->
+            <if test="card_type != null and card_type != ''">
+                and pd.card_type = #{card_type}
+            </if>
+            <!--分润标识-->
+            <if test="settle_method != null and settle_method != ''">
+                and pd.settle_method = #{settle_method}
+            </if>
+            <!--商户类型-->
+            <if test="mer_category != null and mer_category != ''">
+                and pd.mer_category = #{mer_category}
+            </if>
+            <!--交易日期-->
+            <if test="localdate1 != null and localdate1 != ''">
+                and pd.createdate <![CDATA[>=]]> #{localdate1}
+            </if>
+            <if test="localdate2 != null and localdate2 != ''">
+                and pd.createdate <![CDATA[<=]]> #{localdate2}
+            </if>
+        </where>
+        order by pd.createdate desc
+    </select>
+
 </mapper>

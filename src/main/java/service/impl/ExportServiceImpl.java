@@ -1,9 +1,14 @@
 package service.impl;
 
+import dao.UserDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import service.ExportService;
 import task.ExportExcel;
 import task.IncrementLogDownloadTask;
+import util.Utils;
 
+import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,15 +19,19 @@ import java.util.Map;
  * @description: TODO
  * @date 2019/12/416:18
  */
+@Service
 public class ExportServiceImpl implements ExportService {
-    IncrementLogDownloadTask task=new IncrementLogDownloadTask();
-    ExportExcel exportExcel=new ExportExcel();
+    @Resource
+    private UserDao userDao;
+    @Autowired
+    private IncrementLogDownloadTask task;
+
     /**
      *
      *********************************************************.<br>
      * [方法] increaseExcel <br>
      * [描述] 生成表格<br>
-     * [参数] [map](对参数的描述) <br>
+     * [参数] [List](对参数的描述) <br>
      * [返回] boolean <br>
      * [日期] 2019/12/4
      * [时间] 16:31
@@ -30,14 +39,18 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     @Override
-    public boolean increaseExcel(Map map){
+    public boolean increaseExcel(List reqList){
+        Map map=null;
         try {
             //判断导出什么表 查相对应的sql
-            List<Map<String,Object>> dataList=findListByExcel(map);
+            List<Map<String,Object>> dataList=findListByExcel(reqList);
             //生成表头
-            LinkedHashMap<String, String> titileMap=createTitileMap(map);
+            LinkedHashMap<String, String> titileMap=createTitileMap(reqList);
             //生成文件名
-            String fileName=createFileName(map);
+            String fileName=createFileName(reqList);
+            for (Object o:reqList){
+                map=(Map)o;
+            }
             //创建人
             String createMan=String.valueOf(map.get("createMan"));
             //操作类型
@@ -46,9 +59,11 @@ public class ExportServiceImpl implements ExportService {
             Map<String, Object> wb=null;
             wb = ExportExcel.exportListExcelClearExcel(wb, dataList, titileMap, fileName);
             boolean flag = task.downList(wb,fileName,createMan,operator_type);
+            map.clear();
             return flag==true ? true:false;
         } catch (Exception e) {
             e.printStackTrace();
+            map.clear();
             return false;
         }
     }
@@ -65,12 +80,21 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private List<Map<String,Object>> findListByExcel(Map map){
+    private List<Map<String,Object>> findListByExcel(List reqList){
+        //list中0下标是检索条件
+        Map<String,Object> map = (Map)reqList.get(0);
         int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
         switch (operator_type){
             case 18:
                 //代理商分润明细导出
-                break;
+                //查数据
+                System.out.println(operator_type);
+                System.out.println(map);
+                List<Map<String, Object>> list = userDao.distributionDetailsExportExcel(map);
+                //处理数据
+                Utils.dealCard(list);
+                List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
+                return dataList;
             case 19:
                 //代理商交易明细导出
                 break;
@@ -103,8 +127,10 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private LinkedHashMap<String, String> createTitileMap(Map map){
-        return null;
+    private LinkedHashMap<String, String> createTitileMap(List reqList){
+        //1下标是表头
+        LinkedHashMap<String, String> titleMap=(LinkedHashMap<String, String>)reqList.get(1);
+        return titleMap;
     }
     /**
      *
@@ -118,7 +144,32 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private String createFileName(Map map){
+    private String createFileName(List reqList){
+        //list中0下标是检索条件
+        Map<String,Object> map = (Map)reqList.get(0);
+        int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
+        switch (operator_type){
+            case 18:
+                //代理商分润明细导出
+                return Utils.formateDate(1)+"代理商分润明细";
+            case 19:
+                //代理商交易明细导出
+                return Utils.formateDate(1)+"代理商交易明细";
+            case 24:
+                //代理商激活返现明细导出
+                return Utils.formateDate(1)+"代理商激活返现明细";
+            case 21:
+                //代理商终端明细导出
+                return Utils.formateDate(1)+"代理商终端明细";
+            case 22:
+                //代理商流量卡返现明细导出
+                return Utils.formateDate(1)+"代理商流量卡返现明细";
+            case 23:
+                //代理商刷卡达标明细导出
+                return Utils.formateDate(1)+"代理商刷卡达标明细";
+            default:
+                break;
+        }
         return "";
     }
 }

@@ -6,6 +6,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import util.Utils;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -35,6 +37,38 @@ public class ExportExcel{
         return workBookMap;
     }
 
+
+    /**
+     * 导出
+     * @param workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     * @param fileName 文件名称
+     */
+    public static void exportExcel(Map<String, Object> workBookMap, String fileName, String path) throws Exception{
+        FileOutputStream out=null;
+        Workbook workBook = null;
+        try {
+            workBook = (Workbook)workBookMap.get("workBook");
+            //判断导出文件名称
+            if(Utils.IsNull(fileName)){
+                fileName = "导出excel"+Utils.formateDate(4)+".xlsx";
+            }
+            out=new FileOutputStream(path+"/"+ fileName);
+            workBook.write(out);
+            out.flush();
+        }catch (Exception e){
+            throw e;
+        }finally {
+            closeConnection(workBook, out);
+        }
+    }
+    private static void closeConnection(Workbook workbook, OutputStream outputStream) throws Exception{
+        if (workbook != null){
+            workbook.close();
+        }
+        if (outputStream != null){
+            outputStream.close();
+        }
+    }
 
     /**
      * 获取List格式的导出的Workbook

@@ -1,6 +1,7 @@
 package task;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.stereotype.Component;
 import util.Utils;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.Map;
  * @description: TODO
  * @date 2019/12/416:18
  */
+@Component
 public class IncrementLogDownloadTask {
     public boolean downList(Map<String, Object> wb,String fileName,String createMan,String operator_type) throws Exception {
         Map responseMap = new HashMap(16);
@@ -27,7 +29,8 @@ public class IncrementLogDownloadTask {
         Workbook workBook=null;
         try {
             String dateDir= Utils.formateDate(6);
-            File location = new File(System.getProperty("user.dir") +File.separator+"ExcelFile"+File.separator + dateDir);
+            //File location = new File(System.getProperty("user.dir") +File.separator+"ExcelFile"+File.separator + dateDir);
+            File location = new File("D://");
             if (!location.exists()) {
                 location.mkdirs();
             }
