@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 import service.ExportService;
 import service.impl.ExportServiceImpl;
 import socket.BaseIO;
@@ -21,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SuppressWarnings("all")
+@Component
 public class Server extends BaseIO {
 	private static Logger log= LogManager.getLogger(Server.class.getName());
 	private ServerSocket serverSocket;

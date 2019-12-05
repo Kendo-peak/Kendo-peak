@@ -162,7 +162,7 @@ public class MeansUtil{
 	}
 
 	public int byteArrayToShort(byte[] b) throws Exception {
-		return (b[0] << 8) + (b[1] & 0xFF);
+		return (b[0] << 8) + (b[1] & 0xFF);		//(b[1] & 0xFF)-->int
 	}
 
 	public String initSize(String i) throws Exception {
