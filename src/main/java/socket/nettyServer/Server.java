@@ -64,7 +64,6 @@ public class Server extends BaseIO {
 					pack = loFunction.byte2HexStr(bb);
 					pack = loFunction.bytesToString(bb, 0, len,len, "UTF-8");
 					//json转成Map
-					
 					Map reqMap = JSON.parseObject(pack);
 					//生成excel
 					ExportService es=new ExportServiceImpl();
