@@ -1,7 +1,6 @@
 package service.impl;
 
 import dao.UserDao;
-import entity.User;
 import org.apache.ibatis.session.SqlSession;
 import service.ExportService;
 import sqlsession.MySqlSession;
@@ -22,8 +21,6 @@ import java.util.Map;
  */
 public class ExportServiceImpl implements ExportService {
 
-    private MySqlSession mySqlSession = new MySqlSession();
-
     private IncrementLogDownloadTask task = new IncrementLogDownloadTask();
 
     /**
@@ -41,11 +38,13 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public boolean increaseExcel(List<LinkedHashMap<String,String>> reqList){
         Map map=null;
+        List<Map<String,Object>> dataList=null;
+        LinkedHashMap<String, String> titileMap=null;
         try {
             //判断导出什么表 查相对应的sql
-            List<Map<String,Object>> dataList=findListByExcel(reqList);
+            dataList=findListByExcel(reqList);
             //生成表头
-            LinkedHashMap<String, String> titileMap=createTitileMap(reqList);
+            titileMap=createTitileMap(reqList);
             //生成文件名
             String fileName=createFileName(reqList);
             for (Object o:reqList){
@@ -65,6 +64,9 @@ public class ExportServiceImpl implements ExportService {
             e.printStackTrace();
             map.clear();
             return false;
+        }finally {
+            dataList.clear();
+            titileMap.clear();
         }
     }
 
@@ -81,6 +83,7 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     private List<Map<String,Object>> findListByExcel(List<LinkedHashMap<String,String>> reqList) throws IOException {
+        List<Map<String, Object>> dataList = null;
         try(SqlSession session = MySqlSession.getSqlSession()) {
             UserDao userDao = session.getMapper(UserDao.class);
             //list中0下标是检索条件
@@ -93,45 +96,45 @@ public class ExportServiceImpl implements ExportService {
                     List<Map<String, Object>> list = userDao.distributionDetailsExportExcel(map);
                     //处理数据
                     Utils.dealCard(list);
-                    List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
-                    return dataList;
+                    dataList= Utils.distributionDetailsList(list);
+                    break;
                 case 19:
                     //代理商交易明细导出
                     List<Map<String, Object>> transactionList = userDao.transactionDetailsExportExcel(map);
                     //处理数据
                     Utils.dealCard(transactionList);
-                    List<Map<String, Object>> transactionListDataList = Utils.handleTransactionDetailsList(transactionList);
-                    return transactionListDataList;
+                    dataList= Utils.handleTransactionDetailsList(transactionList);
+                    break;
                 case 24:
                     //代理商激活返现明细导出
                     List<Map<String, Object>> activateCashBackList = userDao.activateCashBackDetailsExportExcel(map);
-                    List<Map<String, Object>> activateCashBackDataList = Utils.activateCashBackDetailsList(activateCashBackList);
-                    return activateCashBackDataList;
+                    dataList= Utils.activateCashBackDetailsList(activateCashBackList);
+                    break;
                 case 21:
                     //代理商终端明细导出
-                    List<Map<String, Object>> terminalList = userDao.getexportterminalDetails(map);
-                    for (Map<String, Object> stringObjectMap : terminalList) {
+                    dataList = userDao.getexportterminalDetails(map);
+                    for (Map<String, Object> stringObjectMap : dataList) {
                         Utils.changeNullTerminal(titleMap,stringObjectMap);
                     }
-                    return terminalList;
+                    break;
                 case 22:
                     //代理商流量卡返现明细导出
-                    List<Map<String, Object>> FlowDetailList = userDao.getFlowDetailsExport(map);
-                    for (Map<String, Object> stringObjectMap : FlowDetailList) {
+                    dataList = userDao.getFlowDetailsExport(map);
+                    for (Map<String, Object> stringObjectMap : dataList) {
                         Utils.changeNullFlow(titleMap,stringObjectMap);
                     }
-                    return FlowDetailList;
+                    break;
                 case 23:
                     //代理商刷卡达标明细导出
-                    List<Map<String, Object>> payByCardList = userDao.getpayByCardDetailedExport(map);
-                    for (Map<String, Object> stringObjectMap : payByCardList) {
+                    dataList = userDao.getpayByCardDetailedExport(map);
+                    for (Map<String, Object> stringObjectMap : dataList) {
                         Utils.changeNullPayByCard(titleMap,stringObjectMap);
                     }
-                    return payByCardList;
+                    break;
                 default:
                     break;
             }
-            return null;
+            return dataList;
         }
     }
     /**
