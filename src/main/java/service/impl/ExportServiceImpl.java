@@ -1,6 +1,7 @@
 package service.impl;
 
 import dao.UserDao;
+import org.apache.ibatis.session.SqlSession;
 import service.ExportService;
 import sqlsession.MySqlSession;
 import task.ExportExcel;
@@ -19,8 +20,6 @@ import java.util.Map;
  * @date 2019/12/416:18
  */
 public class ExportServiceImpl implements ExportService {
-
-    private MySqlSession mySqlSession = new MySqlSession();
 
     private IncrementLogDownloadTask task = new IncrementLogDownloadTask();
 
@@ -79,38 +78,41 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     private List<Map<String,Object>> findListByExcel(List reqList) throws IOException {
-        //list中0下标是检索条件
-        Map<String,Object> map = (Map)reqList.get(0);
-        int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
-        switch (operator_type){
-            case 18:
-                //代理商分润明细导出
-                //查数据
-                List<Map<String, Object>> list = mySqlSession.getDao(UserDao.class).distributionDetailsExportExcel(map);
-                //mySqlSession.destroy();
-                //处理数据
-                Utils.dealCard(list);
-                List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
-                return dataList;
-            case 19:
-                //代理商交易明细导出
-                break;
-            case 24:
-                //代理商激活返现明细导出
-                break;
-            case 21:
-                //代理商终端明细导出
-                break;
-            case 22:
-                //代理商流量卡返现明细导出
-                break;
-            case 23:
-                //代理商刷卡达标明细导出
-                break;
-           default:
-               break;
+        try (SqlSession session = MySqlSession.getSqlSession()){
+            UserDao userDao = session.getMapper(UserDao.class);
+            //list中0下标是检索条件
+            Map<String, Object> map = (Map) reqList.get(0);
+            int operator_type = Integer.parseInt(String.valueOf(map.get("operator_type")));
+            switch (operator_type) {
+                case 18:
+                    //代理商分润明细导出
+                    //查数据
+                    List<Map<String, Object>> list = userDao.distributionDetailsExportExcel(map);
+                    //mySqlSession.destroy();
+                    //处理数据
+                    Utils.dealCard(list);
+                    List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
+                    return dataList;
+                case 19:
+                    //代理商交易明细导出
+                    break;
+                case 24:
+                    //代理商激活返现明细导出
+                    break;
+                case 21:
+                    //代理商终端明细导出
+                    break;
+                case 22:
+                    //代理商流量卡返现明细导出
+                    break;
+                case 23:
+                    //代理商刷卡达标明细导出
+                    break;
+                default:
+                    break;
+            }
+            return null;
         }
-        return null;
     }
     /**
      *

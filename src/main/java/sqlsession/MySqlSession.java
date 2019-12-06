@@ -10,23 +10,11 @@ import java.io.InputStream;
 
 public class MySqlSession {
 
-    private SqlSession sqlSession;
-    private SqlSessionFactory factory ;
-    private InputStream resource;
-
-    public SqlSession getSqlSession() throws IOException {
+    public static SqlSession getSqlSession() throws IOException {
         SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-        resource = Resources.getResourceAsStream("mybatis-config.xml");
-        factory = builder.build(resource);
-        return factory.openSession();
-    }
-
-    public <T> T getDao(Class<T> clazz) throws IOException {
-        return getSqlSession().getMapper(clazz);
-    }
-
-    public void destroy() throws IOException {
-        sqlSession.close();
+        InputStream resource = Resources.getResourceAsStream("mybatis-config.xml");
+        SqlSessionFactory factory = builder.build(resource);
         resource.close();
+        return factory.openSession();
     }
 }
