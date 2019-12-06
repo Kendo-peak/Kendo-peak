@@ -1,6 +1,7 @@
 package service.impl;
 
 import dao.UserDao;
+import entity.User;
 import org.apache.ibatis.session.SqlSession;
 import service.ExportService;
 import sqlsession.MySqlSession;
@@ -20,6 +21,8 @@ import java.util.Map;
  * @date 2019/12/416:18
  */
 public class ExportServiceImpl implements ExportService {
+
+    private MySqlSession mySqlSession = new MySqlSession();
 
     private IncrementLogDownloadTask task = new IncrementLogDownloadTask();
 
@@ -77,37 +80,54 @@ public class ExportServiceImpl implements ExportService {
      * [作者] wuhaotai
      *********************************************************.<br>
      */
-    private List<Map<String,Object>> findListByExcel(List reqList) throws IOException {
-        try (SqlSession session = MySqlSession.getSqlSession()){
+    private List<Map<String,Object>> findListByExcel(List<LinkedHashMap<String,String>> reqList) throws IOException {
+        try(SqlSession session = MySqlSession.getSqlSession()) {
             UserDao userDao = session.getMapper(UserDao.class);
             //list中0下标是检索条件
-            Map<String, Object> map = (Map) reqList.get(0);
-            int operator_type = Integer.parseInt(String.valueOf(map.get("operator_type")));
-            switch (operator_type) {
+            Map<String,Object> map = (Map)reqList.get(0);
+            LinkedHashMap<String, String> titleMap=reqList.get(1);
+            int operator_type=Integer.parseInt(String.valueOf(map.get("operator_type")));
+            switch (operator_type){
                 case 18:
                     //代理商分润明细导出
-                    //查数据
                     List<Map<String, Object>> list = userDao.distributionDetailsExportExcel(map);
-                    //mySqlSession.destroy();
                     //处理数据
                     Utils.dealCard(list);
                     List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);
                     return dataList;
                 case 19:
                     //代理商交易明细导出
-                    break;
+                    List<Map<String, Object>> transactionList = userDao.transactionDetailsExportExcel(map);
+                    //处理数据
+                    Utils.dealCard(transactionList);
+                    List<Map<String, Object>> transactionListDataList = Utils.handleTransactionDetailsList(transactionList);
+                    return transactionListDataList;
                 case 24:
                     //代理商激活返现明细导出
-                    break;
+                    List<Map<String, Object>> activateCashBackList = userDao.activateCashBackDetailsExportExcel(map);
+                    List<Map<String, Object>> activateCashBackDataList = Utils.activateCashBackDetailsList(activateCashBackList);
+                    return activateCashBackDataList;
                 case 21:
                     //代理商终端明细导出
-                    break;
+                    List<Map<String, Object>> terminalList = userDao.getexportterminalDetails(map);
+                    for (Map<String, Object> stringObjectMap : terminalList) {
+                        Utils.changeNullTerminal(titleMap,stringObjectMap);
+                    }
+                    return terminalList;
                 case 22:
                     //代理商流量卡返现明细导出
-                    break;
+                    List<Map<String, Object>> FlowDetailList = userDao.getFlowDetailsExport(map);
+                    for (Map<String, Object> stringObjectMap : FlowDetailList) {
+                        Utils.changeNullFlow(titleMap,stringObjectMap);
+                    }
+                    return FlowDetailList;
                 case 23:
                     //代理商刷卡达标明细导出
-                    break;
+                    List<Map<String, Object>> payByCardList = userDao.getpayByCardDetailedExport(map);
+                    for (Map<String, Object> stringObjectMap : payByCardList) {
+                        Utils.changeNullPayByCard(titleMap,stringObjectMap);
+                    }
+                    return payByCardList;
                 default:
                     break;
             }

@@ -85,6 +85,250 @@ public class Utils {
             }
         }
     }
+    //代理商刷卡达标明细导出去空
+    public static void changeNullPayByCard(Map<String,String> titleMap,Map<String,Object> excelMap){
+        for (String titleKey : titleMap.keySet()) {
+            if (!excelMap.keySet().contains(titleKey)) {
+                excelMap.put(titleKey,"暂无");
+                continue;
+            }
+            if ("TYPE".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "反服务费":"交易额达标返现"));
+            }
+            if ("IS_D001".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "否":"是"));
+            }
+            if ("RECH_TYPE".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "Mpos":"传统pos"));
+            }
+        }
+    }
+    //代理流量卡返现明细导出去空
+    public static void changeNullFlow(Map<String,String> titleMap,Map<String,Object> excelMap){
+        for (String titleKey : titleMap.keySet()) {
+            if (!excelMap.keySet().contains(titleKey)) {
+                excelMap.put(titleKey,"暂无");
+                continue;
+            }
+            if ("QUANTITY".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "非首次":"首次"));
+            }
+            if ("RECURRENCE_CYCLE".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "月":"日"));
+            }
+            if ("RECH_TYPE".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "传统_流量卡":"lfb_vip"));
+            }
+        }
+    }
+    //代理商终端明细字段处理
+    public static void changeNullTerminal(Map<String,String> titleMap,Map<String,Object> excelMap){
+        for (String titleKey : titleMap.keySet()) {
+            if (!excelMap.keySet().contains(titleKey)) {
+                excelMap.put(titleKey,"暂无");
+                continue;
+            }
+            if ("ISBOUND".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "已绑定":"未绑定"));
+            }
+            if ("ACTIVATE".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "激活":"未激活"));
+            }
+            if ("RETURN_STATUS".equals(titleKey)){
+                excelMap.put(titleKey,(Integer.parseInt(String.valueOf(excelMap.get(titleKey))) == 1 ? "激活已返":"激活未返"));
+            }
+            if ("IS_DAY_STAGE".equals(titleKey)){
+                int i = Integer.parseInt(String.valueOf(excelMap.get(titleKey)));
+                switch (i) {
+                    case -2:
+                        excelMap.put(titleKey,"变更商户");
+                        break;
+                    case -1:
+                        excelMap.put(titleKey,"已过考核期");
+                        break;
+                    case 0:
+                        excelMap.put(titleKey,"是");
+                        break;
+                    case 1:
+                        excelMap.put(titleKey,"第一阶段");
+                        break;
+                    case 2:
+                        excelMap.put(titleKey,"第二阶段");
+                        break;
+                    case 3:
+                        excelMap.put(titleKey,"第三阶段");
+                        break;
+                    case 4:
+                        excelMap.put(titleKey,"第四阶段");
+                        break;
+                    default:
+                        excelMap.put(titleKey,"暂无数据");
+                        break;
+                }
+            }
+            if ("IS_MON_STAGE".equals(titleKey)){
+                int i = Integer.parseInt(String.valueOf(excelMap.get(titleKey)));
+                switch (i) {
+                    case -2:
+                        excelMap.put(titleKey,"变更商户");
+                        break;
+                    case -1:
+                        excelMap.put(titleKey,"已过考核期");
+                        break;
+                    case 0:
+                        excelMap.put(titleKey,"是");
+                        break;
+                    case 1:
+                        excelMap.put(titleKey,"第一阶段");
+                        break;
+                    case 2:
+                        excelMap.put(titleKey,"第二阶段");
+                        break;
+                    case 3:
+                        excelMap.put(titleKey,"第三阶段");
+                        break;
+                    case 4:
+                        excelMap.put(titleKey,"第四阶段");
+                        break;
+                    default:
+                        excelMap.put(titleKey,"暂无数据");
+                        break;
+                }
+            }
+        }
+    }
+    //处理激活返现字段
+    public static List<Map<String, Object>> activateCashBackDetailsList(List list){
+        List<Map<String, Object>> dataList=new ArrayList<>();
+        for (Object o:list){
+            Map map=(Map)o;
+            if ("".equals(String.valueOf(map.get("RECH_TYPE"))) || map.get("RECH_TYPE")!=null) {
+                if ("0".equals(String.valueOf(map.get("RECH_TYPE")))) {
+                    map.put("RECH_TYPE", "传统Pos");
+                }
+                if ("1".equals(String.valueOf(map.get("RECH_TYPE")))) {
+                    map.put("RECH_TYPE", "Mpos");
+                }
+            }else {
+                map.put("RECH_TYPE", "暂无");
+            }
+            dataList.add(map);
+        }
+        return dataList;
+    }
+    //处理交易明细状态码字段
+    public static List<Map<String, Object>> handleTransactionDetailsList(List list){
+        List<Map<String, Object>> dataList=new ArrayList();
+        for (Object o:list){
+            Map map=(Map)o;
+            //处理交易类型
+            if ("".equals(String.valueOf(map.get("MSGTYPE")))||map.get("MSGTYPE")!=null){
+                if("H007".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","消费");
+                }
+                if("S007".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","流量卡消费");
+                }
+                if("Y007".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","押金消费");
+                }
+                if("V007".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","会员交易");
+                }
+                if("H900".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","参数下载");
+                }
+                if("H000".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","签到");
+                }
+                if("H901".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","公钥下载");
+                }
+                if("H902".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","主密钥交换、下载");
+                }
+                if("H903".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","IC公钥、参数查询");
+                }
+                if("H002".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","余额查询");
+                }
+                if("H014".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","退货");
+                }
+                if("H013".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","冲正");
+                }
+                if("H905".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","应用版本更新查询");
+                }
+                if("H906".equals(String.valueOf(map.get("MSGTYPE")))){
+                    map.put("MSGTYPE","电子签名数据上送");
+                }
+            }else {
+                map.put("MSGTYPE","暂无");
+            }
+            //交易状态
+            if ("".equals(String.valueOf(map.get("STATUS")))||map.get("STATUS")!=null){
+                if ("0".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","成功");
+                }
+                if ("2".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","失败");
+                }
+                if ("20".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","待撤销");
+                }
+                if ("-1".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","撤销");
+                }
+                if ("-2".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","冲正");
+                }
+                if ("50".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","待冲正");
+                }
+                if ("1".equals(String.valueOf(map.get("STATUS")))){
+                    map.put("STATUS","补录");
+                }
+            }else {
+                map.put("STATUS","暂无");
+            }
+            //卡类型
+            if ("".equals(String.valueOf(map.get("CARDTYPE")))||map.get("CARDTYPE")!=null){
+                if ("0".equals(String.valueOf(map.get("CARDTYPE")))){
+                    map.put("CARDTYPE","未知");
+                }
+                if ("1".equals(String.valueOf(map.get("CARDTYPE")))){
+                    map.put("CARDTYPE","借记卡");
+                }
+                if ("2".equals(String.valueOf(map.get("CARDTYPE")))){
+                    map.put("CARDTYPE","贷记卡");
+                }
+            }else {
+                map.put("CARDTYPE","暂无");
+            }
+            //清算类型
+            if ("".equals(String.valueOf(map.get("SETT_TYPE")))||map.get("SETT_TYPE")!=null){
+                if ("0".equals(String.valueOf(map.get("SETT_TYPE")))){
+                    map.put("SETT_TYPE","S0");
+                }else {
+                    map.put("SETT_TYPE","D1");
+                }
+            }
+            //清算状态
+            if ("".equals(String.valueOf(map.get("AU_STATE")))||map.get("AU_STATE")!=null){
+                if ("0".equals(String.valueOf(map.get("AU_STATE")))){
+                    map.put("AU_STATE","未清算");
+                }else {
+                    map.put("AU_STATE","已清算");
+                }
+            }
+            dataList.add(map);
+        }
+        return dataList;
+    }
+
     //处理代理商分润的字段
     public static List<Map<String, Object>> distributionDetailsList(List list){
         List<Map<String, Object>> dataList=new ArrayList();

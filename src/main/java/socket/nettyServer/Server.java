@@ -73,12 +73,12 @@ public class Server extends BaseIO {
 					//json转成list
 					List<LinkedHashMap<String,String>> reqList = JSON.parseObject(pack,new TypeReference<List<LinkedHashMap<String,String>>>(){});
 					//生成excel
-					System.out.println(reqList);
 					ExportService es=new ExportServiceImpl();
 					boolean flag = es.increaseExcel(reqList);
-					//上传excel到文件服务器
+					if(flag){
+						//上传excel到文件服务器
 
-
+					}
 				} catch (Exception e) {
 					log.error(LogFormat.ErrLogFormat("Reveice Data Exception" + pack, null, e));
 				} finally {

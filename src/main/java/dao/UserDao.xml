@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="dao.UserDao" >
-
+    <!--测试链接数据库 -->
     <select id="getAllUser"  resultType="map">
         select
         *
@@ -96,4 +96,278 @@
         order by pd.createdate desc
     </select>
 
+
+    <!--代理商交易明细导出-->
+    <select id="transactionDetailsExportExcel" parameterType="map" resultType="map">
+        select b.serial,b.msgtype, b.TERNO,b.localdate,b.localtime,b.bid, b.pan,b.amount*0.01
+        as amount,
+        b.rc,b.status,b.stan,b.rrno,b.air,b.dd,b.cati,m.MERNO,b.inputtype,b.cardtype,b.sett_type,b.MER_NO,m.AGENT_NO,b.AU_STATE,
+        a.AGENT_NAME,m.MER_NAME,ats.screen_name,m.mer_type
+        from bank_expenditure b
+        left join MERCHANT_INFO m on b.MER_NO=m.MERNO
+        left join accounts ats on b.mer_no = ats.seq_id
+        left join AGENT_INFO a on a.AGENT_NUM=m.AGENT_NO
+        <where>
+            ats.da_marker=2 and m.mer_type=0
+            <!-- 商户编号 -->
+            <if test="mer_no!=null and mer_no!=''">
+                and b.MER_NO=#{params.mer_no}
+            </if>
+            <!--开始日期 -->
+            <if test="startlocaldate!=null and startlocaldate!=''">
+                and b.localdate &gt;=#{startlocaldate}
+            </if>
+            <!--结束日期 -->
+            <if test="endlocaldate!=null and endlocaldate!=''">
+                and b.localdate &lt; =#{endlocaldate}
+            </if>
+            <!-- 代理商编号 -->
+            <if test="agent_no!=null and agent_no!=''">
+                and m.AGENT_NO=#{agent_no}
+            </if>
+            <!-- 交易类型 -->
+            <if test="msgtype!=null and msgtype!=''">
+                and b.msgtype=#{msgtype}
+            </if>
+            <!-- 终端号 -->
+            <if test="posno!=null and posno!=''">
+                and b.TERNO=#{posno}
+            </if>
+            <!-- 交易状态 -->
+            <if test="status!=null and status!=''">
+                and b.status=#{status}
+            </if>
+            <!-- 卡类型 -->
+            <if test="cardtype!=null and cardtype!=''">
+                and b.cardtype=#{cardtype}
+            </if>
+            <!-- 清算状态 -->
+            <if test="sett_status!=null and sett_status!=''">
+                and b.AU_STATE=#{sett_status}
+            </if>
+            <!-- 清算类型 -->
+            <if test="sett_type!=null and sett_type!=''">
+                and b.SETT_TYPE=#{sett_type}
+            </if>
+            <!-- 流水号 -->
+            <if test="serial!=null and serial!=''">
+                and b.serial=#{serial}
+            </if>
+            <!-- 卡号 -->
+            <if test="pan!=null and pan!=''">
+                and b.pan like '%'||#{pan}||'%'
+            </if>
+            <!-- 结算人 -->
+            <if test="screen_name!=null and screen_name!=''">
+                and ats.screen_name like '%'||#{screen_name}||'%'
+            </if>
+        </where>
+        order by b.localdate DESC
+    </select>
+
+    <!--代理商激活返现明细导出 -->
+    <select id="activateCashBackDetailsExportExcel" parameterType="map" resultType="map">
+        select id,posno,sn,term_num,a.act_name,
+        mi.merno merno,mi.mer_name mername,
+        directly_under.agent_num  directly_under_agent_num,
+        directly_under.agent_name directly_under_agent_name,
+        directly_under.agent_level directly_under_agent_level,
+        one.agent_num one_agent_num,
+        one.agent_name one_agent_name,
+        one.agent_level one_agent_level,
+        return_agent.agent_num return_agent_num,
+        return_agent.agent_name return_agent_name,
+        return_agent.agent_level return_agent_level,
+        term_service_money,binding_date,activation_date,recurrence_cycle,return_money,return_date,rech_type,return_tax_money
+        from act_activation_detailed ad, act_active a,
+        (select agent_num,agent_name,agent_level from agent_info ) directly_under,
+        (select agent_num,agent_name,agent_level from agent_info ) one,
+        (select agent_num,agent_name,agent_level from agent_info ) return_agent,
+        merchant_info mi
+        where ad.act_id=a.act_id and ad.directly_under_agentno=directly_under.agent_num and ad.directly_under_agentno=one.agent_num
+        and ad.directly_under_agentno=return_agent.agent_num and ad.merno=mi.merno and mi.mer_type='0'
+        <if test="sn!=null and sn!=''">
+            and sn=#{sn}
+        </if>
+        <if test="return_date1!=null and return_date1!=''">
+            and return_date &gt;=#{return_date1}
+        </if>
+        <if test="return_date2!=null and return_date2!=''">
+            and return_date &lt;=  #{return_date2}
+        </if>
+        <if test="term_num!=null and term_num!=''">
+            and term_num =#{term_num}
+        </if>
+        <if test="begin_time!=null and begin_time!=''">
+            and activation_date &gt;= #{begin_time}
+        </if>
+        <if test="end_time!=null and end_time!=''">
+            and activation_date &lt;= #{end_time}
+        </if>
+        <if test="merno!=null and merno!=''">
+            and mi.merno=#{merno}
+        </if>
+        <if test="mername!=null and mername!=''">
+            and mi.mer_name =#{mername}
+        </if>
+        <if test="act_name!=null and act_name!=''">
+            and a.act_name like '%#{act_name}%'
+        </if>
+        <if test="recurrence_cycle!=null and recurrence_cycle!=''">
+            and recurrence_cycle =#{recurrence_cycle}
+        </if>
+        <if test="rech_type!=null and rech_type!=''">
+            and rech_type =#{rech_type}
+        </if>
+        <if test="directly_under_agent_num!=null and directly_under_agent_num!=''">
+            and directly_under.agent_num =#{directly_under_agent_num}
+        </if>
+        <if test="directly_under_agent_name!=null and directly_under_agent_name!=''">
+            and directly_under.agent_name =#{directly_under_agent_name}
+        </if>
+        <if test="directly_under_agent_level!=null and directly_under_agent_level!=''">
+            and directly_under.agent_level =#{directly_under_agent_level}
+        </if>
+        <if test="return_agent_num!=null and return_agent_num!=''">
+            and return_agent.agent_num =#{return_agent_num}
+        </if>
+        <if test="return_agent_name!=null and return_agent_name!=''">
+            and return_agent.agent_name =#{return_agent_name}
+        </if>
+        order by activation_date desc
+    </select>
+
+
+    <!--代理商终端明细导出-->
+    <select id="getexportterminalDetails" parameterType="map" resultType="map">
+        select bp.*,ai.agent_name from BRANCH_POS  bp
+        left join agent_info ai on bp.agent_num = ai.agent_num
+        where  bp.pos_type = 0
+        <if test="agent_num!=null and agent_num!=''">
+            and bp.agent_num =#{agent_num}
+        </if>
+        <if test="agent_name!=null and agent_name!=''">
+            and ai.agent_name like '%' || #{agent_name} || '%'
+        </if>
+        <if test="posno!=null and posno!=''">
+            and bp.posno =#{posno}
+        </if>
+        <if test="sale_num!=null and sale_num!=''">
+            and bp.sale_num =#{sale_num}
+        </if>
+        <if test="machine_num!=null and machine_num!=''">
+            and bp.machine_num =#{machine_num}
+        </if>
+        <if test="isbound!=null and isbound!=''">
+            and bp.isbound =#{isbound}
+        </if>
+        <if test="activate!=null and activate!=''">
+            and bp.activate =#{activate}
+        </if>
+        <!--添加时间 -->
+        <if test="startlocaldate_add!=null and startlocaldate_add!=''">
+            and to_char( bp.CREATETIME,'YYYY-MM-DD') >= #{startlocaldate_add}
+        </if>
+        <!--激活时间 -->
+        <if test="endlocaldate_add!=null and endlocaldate_add!=''">
+            and to_char( bp.CREATETIME,'YYYY-MM-DD') &lt;= #{endlocaldate_add}
+        </if>
+        <if test="startlocaldate_active!=null and startlocaldate_active!=''">
+            and bp.ACTIVATE_DATE &gt;=#{startlocaldate_active}
+        </if>
+        <!--结束日期 -->
+        <if test="endlocaldate_active!=null and endlocaldate_active!=''">
+            and bp.ACTIVATE_DATE &lt; =#{endlocaldate_active}
+            and to_char( bp.CREATETIME,'YYYY-MM-DD') &lt;= #{endlocaldate_add}
+        </if>
+        order by bp.CREATETIME desc
+    </select>
+
+
+    <!--代理商流量卡返现明细导出-->
+    <select id="getFlowDetailsExport" resultType="map" parameterType="map">
+        select vip.* from vip_agentcash_detailed vip
+        left join bank_expenditure be
+        on vip.serial = to_char(be.serial)
+        left join merchant_info mi
+        on vip.merno = mi.merno
+        where 1=1
+        <!--开始日期 -->
+        <if test="serial!=null and serial!=''">
+            and vip.SERIAL =#{serial}
+        </if>
+        <if test="agent_num!=null and agent_num!=''">
+            and vip.AGENT_NUM =#{agent_num}
+        </if>
+        <if test="merno!=null and merno!=''">
+            and vip.MERNO =#{merno}
+        </if>
+        <if test="mer_name!=null and mer_name!=''">
+            and vip.MER_NAME like '%' || #{mer_name} || '%'
+        </if>
+        <if test="rrno!=null and rrno!=''">
+            and vip.RRNO =#{rrno}
+        </if>
+        <if test="rech_type!=null and rech_type!=''">
+            and vip.RECH_TYPE =#{rech_type}
+        </if>
+        <if test="recurrence_cycle!=null and recurrence_cycle!=''">
+            and vip.RECURRENCE_CYCLE =#{recurrence_cycle}
+        </if>
+        <if test="startlocaldate!=null and startlocaldate!=''">
+            and vip.RETURN_DATE &gt;=#{startlocaldate}
+        </if>
+        <!--结束日期 -->
+        <if test="endlocaldate!=null and endlocaldate!=''">
+            and RETURN_DATE &lt; =#{endlocaldate}
+        </if>
+        and be.msgtype = 'S007'
+        and mi.mer_type = 0
+        order by RETURN_DATE desc
+    </select>
+
+
+    <!--代理商刷卡达标明细导出-->
+    <select id="getpayByCardDetailedExport" parameterType="map" resultType="map">
+        select t.*,act.act_name,mi.mer_name mer_name,ai.agent_name agent_name from ACT_TR_COMPLIANCE_DETAILED t
+        LEFT JOIN agent_info ai
+        ON ai.agent_num = t.directly_under_agentno
+        LEFT JOIN act_active act
+        ON act.act_id = t.act_id
+        LEFT JOIN merchant_info mi
+        ON  mi.merno = t.merno
+        where 1=1 AND  t.rech_type = 0  AND  t.TYPE =0
+        <if test="merno!=null and merno!=''">
+            and mi.MERNO =#{merno}
+        </if>
+        <if test="mer_name!=null and mer_name!=''">
+            and mi.MER_NAME like '%' || #{mer_name} || '%'
+        </if>
+        <if test="directly_under_agentno!=null and directly_under_agentno!=''">
+            and t.directly_under_agentno =#{directly_under_agentno}
+        </if>
+        <if test="agent_name!=null and agent_name!=''">
+            and ai.agent_name like '%' || #{agent_name} || '%'
+        </if>
+        <if test="recurrence_cycle!=null and recurrence_cycle!=''">
+            and t.recurrence_cycle =#{recurrence_cycle}
+        </if>
+        <if test="type!=null and type!=''">
+            and t.type =#{type}
+        </if>
+        <if test="achievement_stage!=null and achievement_stage!=''">
+            and t.achievement_stage =#{achievement_stage}
+        </if>
+        <if test="rech_type!=null and rech_type!=''">
+            and t.RECH_TYPE =#{rech_type}
+        </if>
+        <if test="startlocaldate!=null and startlocaldate!=''">
+            and t.ACHIEVEMENT_DATE &gt;=#{startlocaldate}
+        </if>
+        <if test="endlocaldate!=null and endlocaldate!=''">
+            and t.ACHIEVEMENT_DATE &lt; =#{endlocaldate}
+        </if>
+        and mi.mer_type = 0
+        order by t.achievement_date desc
+    </select>
 </mapper>
