@@ -76,7 +76,7 @@ public class Server extends BaseIO {
 					System.out.println(reqList);
 					ExportService es=new ExportServiceImpl();
 					boolean flag = es.increaseExcel(reqList);
-					//上传excel
+					//上传excel到文件服务器
 
 
 				} catch (Exception e) {

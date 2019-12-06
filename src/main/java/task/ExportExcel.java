@@ -1,11 +1,11 @@
 package task;
 
-
 import com.google.common.collect.Lists;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import util.Utils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -14,28 +14,12 @@ import java.util.*;
  * @author puyiliang
  * @date 2019-12-05
  */
-public class ExportExcel{
+public class ExportExcel {
     /**
-     * 获取List格式的导出的Workbook 并清除List空间
-     * @param workBookMap Map 中有两个key workBook POI工作薄, counter计数器
-     * @param data 需要导出的数据List
-     * @param titleMap 表头Map
-     * @param sheetName Sheet页文件名称
-     * @return workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     * 单Sheet页最大数据条数
      */
-    public static Map<String, Object> exportListExcelClearExcel(Map<String, Object> workBookMap, List<Map<String, Object>> data, LinkedHashMap<String, String> titleMap, String sheetName) throws Exception{
+    private static int sheetDataLength = 59999;
 
-        try {
-            workBookMap = exportListExcel(workBookMap, data, titleMap, sheetName);
-        } catch (Exception e) {
-            throw e;
-        }finally {
-            if (data != null){
-                data.clear();
-            }
-        }
-        return workBookMap;
-    }
 
 
     /**
@@ -52,7 +36,7 @@ public class ExportExcel{
             if(Utils.IsNull(fileName)){
                 fileName = "导出excel"+Utils.formateDate(4)+".xlsx";
             }
-            out=new FileOutputStream(path+"/"+ fileName);
+            out=new FileOutputStream(path+ File.separator+ fileName);
             workBook.write(out);
             out.flush();
         }catch (Exception e){
@@ -61,13 +45,47 @@ public class ExportExcel{
             closeConnection(workBook, out);
         }
     }
-    private static void closeConnection(Workbook workbook, OutputStream outputStream) throws Exception{
-        if (workbook != null){
-            workbook.close();
+    /**
+     * 获取List格式的导出的Workbook 并清除List空间
+     * @param workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     * @param data 需要导出的数据List
+     * @param titleMap 表头Map
+     * @param sheetName Sheet页文件名称
+     * @return workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     */
+    public static Map<String, Object> exportListExcelClearExcel(Map<String, Object> workBookMap, List<Map<String, Object>> data, LinkedHashMap<String, String> titleMap, String sheetName) throws Exception{
+        try {
+            workBookMap = exportListExcel(workBookMap, data, titleMap, sheetName);
+        } catch (Exception e) {
+            throw e;
+        }finally {
+            if (data != null){
+                data.clear();
+            }
         }
-        if (outputStream != null){
-            outputStream.close();
+        return workBookMap;
+    }
+
+    /**
+     * 获取List格式的导出的Workbook 并清除List空间
+     * @param workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     * @param data 需要导出的数据List
+     * @param title 导出Key
+     * @param titleMap 表头Map
+     * @param sheetName Sheet页文件名称
+     * @return workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     */
+    public static Map<String, Object> exportListExcelClearExcel(Map<String, Object> workBookMap, List<Map<String, Object>> data, String[] title, Map<String, String> titleMap, String sheetName) throws Exception{
+        try {
+            workBookMap = exportListExcel(workBookMap, data, title, titleMap, sheetName);
+        } catch (Exception e) {
+            throw e;
+        }finally {
+            if (data != null){
+                data.clear();
+            }
         }
+        return workBookMap;
     }
 
     /**
@@ -76,19 +94,72 @@ public class ExportExcel{
      * @param data 需要导出的数据List
      * @param titleMap 表头Map
      * @param sheetName Sheet页文件名称
-     * @return Workbook POI文件
+     * @return workBookMap Map 中有两个key workBook POI工作薄, counter计数器
      */
     public static Map<String, Object> exportListExcel(Map<String, Object> workBookMap, List<Map<String, Object>> data, LinkedHashMap<String, String> titleMap, String sheetName) throws Exception{
+        workBookMap = workbookMapPlan(workBookMap, sheetName);
+        Workbook workBook= (Workbook)workBookMap.get("workBook");
+        sheetName = (String) workBookMap.get("sheetName");
+        int counter = (int)workBookMap.get("counter");
+        Map<String, CellStyle> styles = createStyles(workBook);
+        //分割数据（按单sheet页支持最大数据分割）
+        List<List<Map<String, Object>>> partition = Lists.partition(data, sheetDataLength);
+        //循环分割之后的List(一次循环产生一个List)
+        for(int i = 0; i < partition.size(); i++){
+            List<Map<String, Object>> dataList = partition.get(i);
+            //获取Sheet页名称
+            String currentSheetName = getCurrentSheetName(sheetName, counter, i);
+            //获取Sheet页
+            Sheet sheet = createSheet(workBook, currentSheetName);
+            //创建表头
+            createHeadRow(sheet, titleMap, styles.get("titleStyle"));
+            //创建数据
+            createDataRow(sheet, dataList, titleMap, styles.get("dataStyle"));
+            workBookMap.put("counter", counter + i);
+        }
+        return workBookMap;
+    }
+
+    /**
+     * 获取List格式的导出的Workbook
+     * @param workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     * @param data 需要导出的数据List
+     * @param titleMap 表头Map
+     * @param sheetName Sheet页文件名称
+     * @return workBookMap Map 中有两个key workBook POI工作薄, counter计数器
+     */
+    public static Map<String, Object> exportListExcel(Map<String, Object> workBookMap, List<Map<String, Object>> data,String[] title, Map<String, String> titleMap, String sheetName) throws Exception{
+        workBookMap = workbookMapPlan(workBookMap, sheetName);
+        Workbook workBook= (Workbook)workBookMap.get("workBook");
+        int counter = (int)workBookMap.get("counter");
+        sheetName = (String) workBookMap.get("sheetName");
+        Map<String, CellStyle> styles = createStyles(workBook);
+        //分割数据（按单sheet页支持最大数据分割）
+        List<List<Map<String, Object>>> partition = Lists.partition(data, sheetDataLength);
+        //循环分割之后的List(一次循环产生一个List)
+        for(int i = 0; i < partition.size(); i++){
+            List<Map<String, Object>> dataList = partition.get(i);
+            String currentSheetName = getCurrentSheetName(sheetName, counter, i);
+            //获取Sheet页
+            Sheet sheet = createSheet(workBook, currentSheetName);
+            //创建表头
+            createHeadRow(sheet, title, titleMap, styles.get("titleStyle"));
+            //创建数据
+            createDataRow(sheet, dataList, title, styles.get("dataStyle"));
+            workBookMap.put("counter", counter + i);
+        }
+        return workBookMap;
+    }
+
+    private static Map<String, Object> workbookMapPlan(Map<String, Object> workBookMap, String sheetName){
         Workbook workBook;
-        int counter = 0;
         if (workBookMap == null){
             workBookMap = new HashMap<>(2);
             workBook = new SXSSFWorkbook(100);
             workBookMap.put("workBook", workBook);
-            workBookMap.put("counter", counter);
+            workBookMap.put("counter", 0);
         }else{
             workBook = (Workbook) workBookMap.get("workBook");
-            counter = (int)workBookMap.get("counter");
         }
 
         if (workBook == null){
@@ -96,32 +167,29 @@ public class ExportExcel{
             workBook = new SXSSFWorkbook(100);
             workBookMap.put("workBook", workBook);
         }
-        Map<String, CellStyle> styles = createStyles(workBook);
-        //单Sheet页数据最大数量
-        int sheetDataLength = 59999;
-        //分割数据（按单sheet页支持最大数据分割）
-        List<List<Map<String, Object>>> partition = Lists.partition(data, sheetDataLength);
-        //循环分割之后的List(一次循环产生一个List)
-        for(int i = 0; i < partition.size(); i++){
-            List<Map<String, Object>> dataList = partition.get(i);
-            //获取Sheet页名称
-            String currentSheetName = sheetName;
-            int currentCounter = 0;
-            if (i > 0 || counter > 0){
-                currentCounter = i + counter;
-                currentSheetName = sheetName + currentCounter;
-            }
-            //获取Sheet页
-            Sheet sheet = createSheet(workBook, currentSheetName);
-            //创建表头
-            createHeadRow(sheet, titleMap, styles.get("cell_header_title"));
-            //创建数据
-            createDataRow(sheet, dataList, titleMap, styles.get("cell_data_default"));
-            workBookMap.put("counter", currentCounter);
+        if (Utils.IsNull(sheetName)){
+            sheetName = "sheet";
         }
+        workBookMap.put("sheetName",sheetName);
         return workBookMap;
     }
 
+    /**
+     * 获取当前分页SheetName
+     * @param sheetName String
+     * @param counter 总计数器
+     * @param loopCounter 循环计数器
+     * @return String
+     */
+    private static String getCurrentSheetName(String sheetName, int counter, int loopCounter){
+        //获取Sheet页名称
+        String currentSheetName = sheetName;
+        if (loopCounter > 0 || counter > 0){
+            int currentCounter = loopCounter + counter;
+            currentSheetName = sheetName + currentCounter;
+        }
+        return currentSheetName;
+    }
 
     /**
      * 创建Sheet
@@ -171,6 +239,32 @@ public class ExportExcel{
     }
 
     /**
+     * 创建表头
+     * @param sheet sheet页
+     * @param titleMap 表头Map
+     */
+    private static void createHeadRow(Sheet sheet,String[] title ,Map<String, String> titleMap, CellStyle cellStyle){
+        //创建表头
+        Row row = sheet.createRow(0);
+        //存放表头数据
+        for(int i = 0; i < title.length; i++){
+            String titleKey = title[i];
+            Cell cell = row.createCell(i);
+            //表头值
+            cell.setCellValue(titleMap.get(titleKey));
+            //风格
+            if(cellStyle != null){
+                cell.setCellStyle(cellStyle);
+            }
+            //设定单元格宽度
+            sheet.setColumnWidth(i,30 * 256);
+        }
+        //锁定表头
+        sheet.createFreezePane(0,1, 0, 1 );
+    }
+
+
+    /**
      * 创建表格数据
      * @param sheet sheet页
      * @param titleMap 表头Map
@@ -185,25 +279,37 @@ public class ExportExcel{
             int k = 0;
             for (String titleKey : titleMap.keySet()) {
                 Cell cell = row.createCell(k);
-                Object value = data.get(titleKey);
-                if (Utils.isNumber(value)){
-                    //当数据为数字类型
-                    cell.setCellType(CellType.NUMERIC);
-                    cell.setCellValue(Double.parseDouble(String.valueOf(value)));
-                }else{
-                    //当数据为非数字类型
-                    cell.setCellType(CellType.STRING);
-                    cell.setCellValue(Utils.castStringNullToEmpty(String.valueOf(value)));
-                }
-                //风格
-                if(cellStyle != null){
-                    cell.setCellStyle(cellStyle);
-                }
+                setCellValue(cell, data.get(titleKey), cellStyle);
                 k++;
             }
         }
     }
 
+    /**
+     * 创建表格数据
+     * @param sheet sheet页
+     * @param title 数据Key
+     * @param dataList 数据列表
+     * @param cellStyle 单元格风格
+     */
+    private static void createDataRow(Sheet sheet, List<Map<String, Object>> dataList, String[] title, CellStyle cellStyle) {
+        for(int i = 1; i <= dataList.size(); i++){
+            Map<String, Object> data = dataList.get(i - 1);
+            Row row = sheet.createRow(i);
+            //存放表格数据
+            for(int k =0; k < title.length; k++){
+                String titleKey = title[k];
+                Cell cell = row.createCell(k);
+                setCellValue(cell, data.get(titleKey), cellStyle);
+            }
+        }
+    }
+
+    /**
+     * 创建表格样式
+     * @param wb Workbook
+     * @return Map key['titleStyle','dataStyle'] titleStyle表头样式 dataStyle数据样式
+     */
     private static Map<String, CellStyle> createStyles(Workbook wb) {
         Map<String, CellStyle> styles = new HashMap<>(2);
         //----------------------标题样式---------------------------
@@ -212,8 +318,8 @@ public class ExportExcel{
         //-----------------------字体样式---------------------------
         CellStyle cellDataDefault = wb.createCellStyle();
         setCellStyle(wb, cellDataDefault, 1);
-        styles.put("cell_header_title", cellHeaderTitle);
-        styles.put("cell_data_default", cellDataDefault);
+        styles.put("titleStyle", cellHeaderTitle);
+        styles.put("dataStyle", cellDataDefault);
         return styles;
     }
 
@@ -245,4 +351,28 @@ public class ExportExcel{
         cellStyle.setBorderRight(BorderStyle.THIN);
     }
 
+    private static void setCellValue(Cell cell, Object value, CellStyle cellStyle){
+        if (Utils.isNumber(value)){
+            //当数据为数字类型
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellValue(Double.parseDouble(String.valueOf(value)));
+        }else{
+            //当数据为非数字类型
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue(Utils.castStringNullToEmpty(String.valueOf(value)));
+        }
+        //风格
+        if(cellStyle != null){
+            cell.setCellStyle(cellStyle);
+        }
+    }
+
+    private static void closeConnection(Workbook workbook, OutputStream outputStream) throws Exception{
+        if (workbook != null){
+            workbook.close();
+        }
+        if (outputStream != null){
+            outputStream.close();
+        }
+    }
 }

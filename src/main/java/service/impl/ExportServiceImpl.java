@@ -86,10 +86,8 @@ public class ExportServiceImpl implements ExportService {
             case 18:
                 //代理商分润明细导出
                 //查数据
-                System.out.println(operator_type);
-                System.out.println(map);
                 List<Map<String, Object>> list = mySqlSession.getDao(UserDao.class).distributionDetailsExportExcel(map);
-                mySqlSession.destroy();
+                //mySqlSession.destroy();
                 //处理数据
                 Utils.dealCard(list);
                 List<Map<String, Object>> dataList = Utils.distributionDetailsList(list);

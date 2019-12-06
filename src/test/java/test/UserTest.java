@@ -28,7 +28,7 @@ public class UserTest {
 
     @Test
     public void fun() {
-        sqlSession = factory.openSession(true);
+        sqlSession = factory.openSession();
         UserDao userDao = sqlSession.getMapper(UserDao.class);
         System.out.println(userDao.getAllUser());
     }
@@ -37,6 +37,5 @@ public class UserTest {
     public void destroy() throws IOException {
         sqlSession.close();
         resource.close();
-
     }
 }
