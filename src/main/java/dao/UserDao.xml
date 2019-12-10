@@ -371,6 +371,211 @@
         order by t.achievement_date desc
     </select>
 
+    <!--商户月统计-->
+    <select id="getMerchantMonthExport" resultType="map" parameterType="map">
+        select
+        mi.merno,mi.mer_name,mi.mer_nature,mi.mer_category,mi.mer_address,mi.mer_status,mi.legal_name,mi.legal_cer,mi.show_legalcerno,mi.trad_status,
+        mi.add_date,mi.add_time,mi.org_merno,mi.picture,mi.agent_no,mi.show_linkphone,mi.settle_cycle,mi.org_serial,
+        ms.merno as merchant_schedule
+        from merchant_info mi
+        left join merchant_schedule ms on mi.merno = ms.merno
+        <where>
+            <if test="add_date!=null and add_date!=''">
+                substr(mi.ADD_DATE,0,7) <![CDATA[=]]> #{add_date}
+            </if>
+            <if test="agent_num != null and agent_num != ''">
+                and mi.agent_no = #{agent_num}
+            </if>
+            <if test="mer_nature != null and mer_nature != ''">
+                and mi.mer_nature=#{mer_nature}
+            </if>
+            <if test="mer_status != null and mer_status != ''">
+                and mi.mer_status=#{mer_status}
+            </if>
+        </where>
+        order by mi.add_date desc
+    </select>
+    <!--终端明细导出-->
+    <select id="getTerminalInformationData" parameterType="map" resultType="map">
+        select
+        bp.agent_num,ai.agent_name,bp.posno,bp.machine_num,bp.isbound,fp.merno,mi.mer_name,to_char(bp.createtime,
+        'yyyy-MM-dd') createdate
+        from branch_pos bp
+        left join agent_info ai on ai.agent_num=bp.agent_num
+        left join formal_pos fp on fp.posno = bp.posno
+        left join merchant_info mi on mi.merno = fp.merno
+        <where>
+            bp.POS_TYPE=3
+            <!-- 机构限制 -->
+            <if test="obj_no!=null and obj_no!=''">
+                and to_char(bp.agent_num) = #{obj_no}
+            </if>
+            <!-- 代理商编号 -->
+            <if test="agent_num!=null and agent_num!=''">
+                and to_char(bp.agent_num)=#{agent_num}
+            </if>
+            <!-- 代理商名称 -->
+            <if test="agent_name!=null and agent_name!=''">
+                and ai.agent_name like '%${agent_name}%'
+            </if>
+            <!-- 商户编号 -->
+            <if test="merno!=null and merno!=''">
+                and to_char(bp.merno)=#{merno}
+            </if>
+            <!-- 商户名称 -->
+            <if test="mer_name!=null and mer_name!=''">
+                and mi.mer_name like '%${mer_name}%'
+            </if>
+            <!-- 终端编号 -->
+            <if test="posno!=null and posno!=''">
+                and to_char(bp.posno) = #{posno}
+            </if>
+            <!-- 添加时间（开始） -->
+            <if test="start_createdate!=null and start_createdate!=''">
+                and to_char(bp.createtime, 'yyyy-MM-dd') <![CDATA[>=]]> #{start_createdate}
+            </if>
+            <!-- 添加时间（截止） -->
+            <if test="end_createdate!=null and end_createdate!=''">
+                and to_char(bp.createtime, 'yyyy-MM-dd') <![CDATA[<=]]> #{end_createdate}
+            </if>
+        </where>
+        order by createdate desc
+    </select>
+    <!--交易统计年月日报表导出-->
+    <select id="getDateCountJsonExcelExport" parameterType="map" resultType="map">
+        select DATA  from TRADE_DATACOUNT
+        <where>
+            DATE_TYPE=#{date_type}
+            and STATISTICS_TYPE=#{statistics_type}
+            <!-- 机构编号 -->
+            <if test="agent_num!=null and agent_num!=''">
+                and AGENT_NUM=#{agent_num}
+            </if>
+            <!-- 机构名称 -->
+            <if test="agent_name!=null and agent_name!=''">
+                and AGENT_NAME=#{agent_name}
+            </if>
+            <!-- 开始日期 -->
+            <if test="start_localdate!=null and start_localdate!=''">
+                and CREATE_DATE <![CDATA[>=]]> #{start_localdate}
+            </if>
+            <!-- 结束日期 -->
+            <if test="end_localdate!=null and end_localdate!=''">
+                and CREATE_DATE <![CDATA[<=]]> #{end_localdate}
+            </if>
+        </where>
+        order BY
+        CREATE_DATE desc
+    </select>
+    <!--账户记录导出明细-->
+    <select id="getExportDataBycount" resultType="map" parameterType="map">
+        select a.increment_log_id, a.amount, a.type, a.note, a.insurance_type, a.create_date, a.create_time, a.create_name, a.agent_num,
+        a.agent_name, a.create_id from increment_log a
+        left join agent_info b on b.agent_num = a.agent_num
+        <where>
+            <!-- 机构状态 -->
+            b.agent_nature = 2
+            <!-- 代理商编号 -->
+            <if test="agent_num!=null and agent_num!=''">
+                and a.agent_num=#{agent_num}
+            </if>
+            <!-- 添加日期（开始） -->
+            <if test="create_date!=null and create_date!=''">
+                and a.create_date <![CDATA[>=]]> #{create_date}
+            </if>
+            <!-- 添加日期（截止） -->
+            <if test="create_date!=null and create_date!=''">
+                and a.create_date <![CDATA[<=]]> #{create_date}
+            </if>
+            <!-- 类型 -->
+            <if test="type!=null and ype!=''">
+                and a.type = #{type}
+            </if>
+            <!--增值服务类型-->
+            <if test="insurance_type!=null and insurance_type!=''">
+                and a.insurance_type = #{insurance_type}
+            </if>
+        </where>
+        order by a.create_date desc,a.create_time desc
+    </select>
+    <!--根据历史消费统计查询明细-->
+    <select id="getexportExcelByAppreciation" resultType="map" parameterType="map">
+        SELECT  NAME,TRANSACTION_AMOUNT,CHANNEL_NO,CHANNEL_COST,CREATE_DATE,AGENT_NUM,AGENT_NAME,SERIAL,SHOW_CERT_NO,SHOW_MOBILE,CREATE_TIME from INSURANCE_DETAIL id
+        <where>
+            <!-- 代理商编号 -->
+            <if test="agent_num!=null and agent_num!=''">
+                id.agent_num=#{agent_num}
+            </if>
+        </where>
+        ORDER by id.create_date desc
+    </select>
+    <!--交易信息导出-->
+    <select id="getList" parameterType="map" resultType="map">
+        select be.serial,be.msgtype,be.localdate,be.localtime,be.bid,be.pan,(be.amount*0.01) as amount,
+        be.rc,be.status,be.stan,be.rrno,be.air,be.dd,be.cati,be.bno,be.inputtype,be.syschar,be.cardtype,
+        be.sett_type,be.mer_no,be.terno,be.sn,be.isdissmis,be.isysf,be.au_state,be.bi_state,
+        be.phonepay,be.is_t001,be.settdate,
+        ai.agent_name,ai.agent_num,mi.merno,mi.mer_name from bank_expenditure be
+        left join formal_pos fp on fp.posno = be.terno and fp.pos_type = '3'
+        left join merchant_info mi on mi.merno = be.mer_no
+        left join agent_info ai on ai.agent_num = mi.agent_no
+        <where>
+            (ai.agent_nature = 2 OR ai.agent_nature = 9)
+            <!-- 如果不是顶级机构 限制查询本机构 -->
+            <if test="obj_no != null and obj_no != ''">
+                and to_char(ai.agent_num) = #{obj_no}
+            </if>
+            <!-- 机构编号 -->
+            <if test="agent_num != null and agent_num != ''">
+                and to_char(ai.agent_num) = #{agent_num}
+            </if>
+            <!-- 机构名称 -->
+            <if test="agent_name != null and agent_name != ''">
+                and ai.agent_name like '%${agent_name}%'
+            </if>
+            <!-- 商户编号 -->
+            <if test="merno != null and merno != ''">
+                and to_char(mi.merno) = #{merno}
+            </if>
+            <!-- 商户名称 -->
+            <if test="mer_name != null and mer_name != ''">
+                and mi.mer_name like '%${mer_name}%'
+            </if>
+            <!-- 交易流水号 -->
+            <if test="serial != null and serial != ''">
+                and to_char(be.serial) = #{serial}
+            </if>
+            <!-- 系统终端号 -->
+            <if test="terno != null and terno != ''">
+                and to_char(be.terno) = #{terno}
+            </if>
+            <!-- 卡类型 -->
+            <if test="cardtype != null and cardtype != ''">
+                and to_char(be.cardtype) = #{cardtype}
+            </if>
+            <!-- 结算类型 -->
+            <if test="sett_type != null and sett_type != ''">
+                and to_char(be.sett_type) = #{sett_type}
+            </if>
+            <!-- 清算状态 -->
+            <if test="au_state != null and au_state != ''">
+                and to_char(be.au_state) = #{params.au_state}
+            </if>
+            <!-- 对账状态 -->
+            <if test="bi_state != null and bi_state != ''">
+                and to_char(be.bi_state) = #{bi_state}
+            </if>
+            <!-- 添加时间（开始） -->
+            <if test="start_localdate!=null and start_localdate!=''">
+                and be.localdate <![CDATA[>=]]> #{start_localdate}
+            </if>
+            <!-- 添加时间（截止） -->
+            <if test="end_localdate!=null and end_localdate!=''">
+                and be.localdate <![CDATA[<=]]> #{end_localdate}
+            </if>
+        </where>
+        order by be.localdate DESC
+    </select>
     <!--保存异步任务操作表-->
     <insert id="saveJobTask" parameterType="map">
         insert into jobtask(ID,OPERATOR_TYPE,FILENAME,OPERATOR_CONTENT,ADDMAN,ADDTIME,FILEID)

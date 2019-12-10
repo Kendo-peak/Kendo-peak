@@ -26,4 +26,23 @@ public interface UserDao {
 
     //保存到jobtask表
     void saveJobTask(Map map);
+
+    //商户月统计
+    List<Map<String,Object>> getMerchantMonthExport(Map<String, Object> map);
+
+    //终端明细导出
+    List<Map<String,Object>> getTerminalInformationData(Map<String, Object> map);
+
+    //交易统计年月日报表导出
+    List<Map<String,Object>> getDateCountJsonExcelExport(Map<String, Object> map);
+
+    //账户记录导出明细
+    List<Map<String,Object>> getExportDataBycount(Map<String, Object> map);
+
+    //历史消费详情导出
+    List<Map<String,Object>> getexportExcelByAppreciation(Map<String, Object> map);
+
+    //交易信息导出
+    List<Map<String,Object>> getList(Map<String, Object> map);
+
 }
