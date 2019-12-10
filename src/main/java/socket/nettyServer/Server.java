@@ -2,27 +2,27 @@ package socket.nettyServer;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.ExportService;
 import service.impl.ExportServiceImpl;
 import socket.BaseIO;
 import util.LogFormat;
 import util.MeansUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SuppressWarnings("all")
 public class Server extends BaseIO {
-	private static Logger log= LogManager.getLogger(Server.class.getName());
+	private static Logger log= LoggerFactory.getLogger(Server.class);
 	private ServerSocket serverSocket;
 	private MeansUtil loFunction = new MeansUtil();
 
@@ -57,7 +57,7 @@ public class Server extends BaseIO {
 					socket.setSoTimeout(30000);
 //					byte[] lenByte = new byte[2];
 //					input.read(lenByte, 0, 2);
-					//int len = (int) loFunction.byteArrayToShort(lenByte);
+//					int len = (int) loFunction.byteArrayToShort(lenByte);
 					int len = 0;
 					while (len == 0) {
 						len = input.available();
@@ -71,13 +71,11 @@ public class Server extends BaseIO {
 					pack = loFunction.bytesToString(bb, 0, len,len, "UTF-8");
 					//json转成list
 					List<LinkedHashMap<String,String>> reqList = JSON.parseObject(pack,new TypeReference<List<LinkedHashMap<String,String>>>(){});
-					//生成excel
+					//生成excel并上传至文件服务器
 					ExportService es=new ExportServiceImpl();
 					boolean flag = es.increaseExcel(reqList);
-					if(flag){
-						//上传excel到文件服务器
 
-					}
+
 				} catch (Exception e) {
 					log.error(LogFormat.ErrLogFormat("Reveice Data Exception" + pack, null, e));
 				} finally {

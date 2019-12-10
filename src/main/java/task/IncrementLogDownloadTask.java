@@ -18,15 +18,13 @@ import java.util.Map;
  * @date 2019/12/416:18
  */
 public class IncrementLogDownloadTask {
-    public boolean downList(Map<String, Object> wb,String fileName,String createMan,String operator_type) throws Exception {
-        Map responseMap = new HashMap(16);
+    public File downList(Map<String, Object> wb,String fileName,String operator_type) throws Exception {
         FileOutputStream fos = null;
         File file = null;
         Workbook workBook=null;
         try {
             String dateDir= Utils.formateDate(6);
-            //File location = new File(System.getProperty("user.dir") +File.separator+"ExcelFile"+File.separator + dateDir);
-            File location = new File("D://");
+            File location = new File(System.getProperty("user.dir") +File.separator+"ExcelFile");
             if (!location.exists()) {
                 location.mkdirs();
             }
@@ -38,25 +36,15 @@ public class IncrementLogDownloadTask {
                 file.createNewFile();
                 fos = new FileOutputStream(file);
                 workBook = (Workbook) wb.get("workBook");
-                if(workBook==null){
-                    return false;
-                }
+                if(workBook!=null){
                 workBook.write(fos);
-                responseMap.put("operator_type", operator_type);
-                responseMap.put("filename", dateDir + File.separator + fileName + ".xlsx");
-                responseMap.put("operator_content", "导出成功，详情请下载excel");
-                responseMap.put("addman", createMan);
-                responseMap.put("addtime", Utils.formateDate(2));
-                return true;
+                return file;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                responseMap.put("operator_type", operator_type);
-                responseMap.put("filename", "errorFile");
-                responseMap.put("operator_content", "出现异常,联系技术人员");
-                responseMap.put("addman", createMan);
-                responseMap.put("addtime", Utils.formateDate(2));
-                return false;
+                return null;
             }
+            return null;
     }
 
 }

@@ -15,6 +15,6 @@ public class MySqlSession {
         InputStream resource = Resources.getResourceAsStream("mybatis-config.xml");
         SqlSessionFactory factory = builder.build(resource);
         resource.close();
-        return factory.openSession();
+        return factory.openSession(true);
     }
 }

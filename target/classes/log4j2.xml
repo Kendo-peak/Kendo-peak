@@ -44,9 +44,9 @@
 		
 	</appenders>
 	<loggers>
-		<root level="all">  
+		<root level="all">
            <appender-ref ref="info" />
 			<appender-ref ref="Err" />
-        </root> 
+        </root>
 	</loggers>
 </configuration>

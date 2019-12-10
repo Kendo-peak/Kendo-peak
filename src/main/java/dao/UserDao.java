@@ -23,4 +23,7 @@ public interface UserDao {
 
     //代理商刷卡达标明细导出
     List<Map<String,Object>> getpayByCardDetailedExport(Map<String, Object> map);
+
+    //保存到jobtask表
+    void saveJobTask(Map map);
 }

@@ -370,4 +370,18 @@
         and mi.mer_type = 0
         order by t.achievement_date desc
     </select>
+
+    <!--保存异步任务操作表-->
+    <insert id="saveJobTask" parameterType="map">
+        insert into jobtask(ID,OPERATOR_TYPE,FILENAME,OPERATOR_CONTENT,ADDMAN,ADDTIME,FILEID)
+        values(
+        seq_jobtask.nextval,
+        #{operator_type},
+        #{filename},
+        #{operator_content},
+        #{addman},
+        to_date(#{addtime},'yyyy-mm-dd hh24:mi:ss'),
+        #{fileid}
+        )
+    </insert>
 </mapper>

@@ -33,6 +33,7 @@ public class Utils {
         return true;
     }
 
+
     /**
      *
      *********************************************************.<br>
@@ -371,115 +372,6 @@ public class Utils {
         }
         return dataList;
     }
-    /**
-     * @Author: gxg
-     * @Date: 2019/11/18 10:38
-     * @Description:  数据量大时分sheet页
-     * @Version: 1.0
-     */
-    public static File poi(String[] exceltitle, List<Object[]> list, int[] colunwidth, String fielName, String path, String type) throws IOException {
-        // 创建HSSFWorkbook对象(excel的文档对象)
-        File file = null;
-        FileOutputStream fos = null;
-        Workbook wb=null;
-        try {
-            File isfile = new File(path);
-            if (!isfile.exists()) {
-                isfile.mkdirs();
-            }
-            file = new File(path, fielName + "." + type);
-            file.createNewFile();
-            fos = new FileOutputStream(file);
-            if ("xlsx".equals(type)) {
-                wb = new XSSFWorkbook();
-                int listSize = list.size();
-                for (int page = 0 ; page < listSize/perSheetCount+1 ; page ++){
-                    List<Object[]> listFrom = (List<Object[]>) list.subList((page) * perSheetCount, (page + 1) * perSheetCount > listSize ? list.size() : (page + 1) * perSheetCount);
-                    List<Object[]> listTo = new ArrayList();
-                    for (Object[] objects : listFrom) {
-                        listTo.add(objects);
-                    }
-                    if (null != exceltitle) {
-                        listTo.add(0,exceltitle);
-                    }
-                    // 建立新的sheet对象（excel的表单）
-                    Sheet sheet = wb.createSheet("sheet"+(page+1));
-                    // 在sheet里创建第一行，参数为行索引(excel的行)，可以是0～65535之间的任何一个
-                    // 创建单元格（excel的单元格，参数为列索引，可以是0～255之间的任何一个
-                    CellStyle cellStyle = wb.createCellStyle();
-                    Font fontStyle = wb.createFont();
-                    fontStyle.setFontName("宋体");
-                    fontStyle.setFontHeightInPoints((short) 14);
-                    cellStyle.setFont(fontStyle);
-                    // 在sheet里创建第二行
-                    for (int i = 0; i < listTo.size(); i++) {
-                        Row row = sheet.createRow(i);
-                        row.setRowStyle(cellStyle);
-                        for (int j = 0; j < listTo.get(i).length; j++) {
-                            //设置单元格值
-                            row.createCell(j).setCellValue(listTo.get(i)[j] + "");
-                            //设置指定列的列宽，256 * 50这种写法是因为width参数单位是单个字符的256分之一
-                            if (colunwidth[j] != 0) {
-                                sheet.setColumnWidth(j, 256 * colunwidth[j]);
-                            }
-                        }
-                    }
-                }
-                wb.write(fos);
-            } else if ("xls".equals(type)) {
-                wb = new HSSFWorkbook();
-                // 建立新的sheet对象（excel的表单）
-                int listSize = list.size();
-                for (int page = 0 ; page < listSize/perSheetCount+1 ; page ++) {
-                    List<Object[]> listFrom = (List<Object[]>) list.subList((page) * perSheetCount, (page + 1) * perSheetCount > listSize ? list.size() : (page + 1) * perSheetCount);
-                    List<Object[]> listTo = new ArrayList();
-                    for (Object[] objects : listFrom) {
-                        listTo.add(objects);
-                    }
-                    if (null != exceltitle) {
-                        listTo.add(0,exceltitle);
-                    }
-                    Sheet sheet = wb.createSheet("sheet"+(page+1));
-                    // 在sheet里创建第一行，参数为行索引(excel的行)，可以是0～65535之间的任何一个
-                    // 创建单元格（excel的单元格，参数为列索引，可以是0～255之间的任何一个
-                    CellStyle cellStyle = wb.createCellStyle();
-                    Font fontStyle = wb.createFont();
-                    fontStyle.setFontName("宋体");
-                    fontStyle.setFontHeightInPoints((short) 14);
-                    cellStyle.setFont(fontStyle);
-                    // 在sheet里创建第二行
-                    for (int i = 0; i < listTo.size(); i++) {
-                        Row row = sheet.createRow(i);
-                        row.setRowStyle(cellStyle);
-                        for (int j = 0; j < listTo.get(i).length; j++) {
-                            //设置单元格值
-                            row.createCell(j).setCellValue(listTo.get(i)[j] + "");
-                            //设置指定列的列宽，256 * 50这种写法是因为width参数单位是单个字符的256分之一
-                            if (colunwidth[j] != 0) {
-                                sheet.setColumnWidth(j, 256 * colunwidth[j]);
-                            }
-                        }
-                    }
-                }
-                wb.write(fos);
-            }
-        } catch (IOException e) {
-            throw e;
-        }finally {
-            if(null!=list&&list.size()>0){
-                list.clear();
-            }
-            if(null !=fos){
-                fos.close();
-            }
-            if(null!=wb){
-                wb.close();
-            }
-        }
-
-        return file;
-    }
-
 
     /**
      * 判断一个Object 是否能转数字

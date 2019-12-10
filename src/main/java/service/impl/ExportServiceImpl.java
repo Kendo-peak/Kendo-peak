@@ -1,6 +1,7 @@
 package service.impl;
 
 import dao.UserDao;
+import fastdfs.FastDFSClient;
 import org.apache.ibatis.session.SqlSession;
 import service.ExportService;
 import sqlsession.MySqlSession;
@@ -8,7 +9,9 @@ import task.ExportExcel;
 import task.IncrementLogDownloadTask;
 import util.Utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +40,7 @@ public class ExportServiceImpl implements ExportService {
      */
     @Override
     public boolean increaseExcel(List<LinkedHashMap<String,String>> reqList){
-        Map map=null;
+        Map<String,Object> map = (Map)reqList.get(0);
         List<Map<String,Object>> dataList=null;
         LinkedHashMap<String, String> titileMap=null;
         try {
@@ -47,9 +50,6 @@ public class ExportServiceImpl implements ExportService {
             titileMap=createTitileMap(reqList);
             //生成文件名
             String fileName=createFileName(reqList);
-            for (Object o:reqList){
-                map=(Map)o;
-            }
             //创建人
             String createMan=String.valueOf(map.get("createMan"));
             //操作类型
@@ -57,19 +57,73 @@ public class ExportServiceImpl implements ExportService {
             //根据数据生成excel文件
             Map<String, Object> wb=null;
             wb = ExportExcel.exportListExcelClearExcel(wb, dataList, titileMap, fileName);
-            boolean flag = task.downList(wb,fileName,createMan,operator_type);
+            File file = task.downList(wb,fileName,operator_type);
             map.clear();
-            return flag==true ? true:false;
+            if (file.exists()){
+                //上传文件
+                Map<String, String> saveMap = new HashMap(16);
+                Map<String, String> metaList = new HashMap<>();
+                metaList.put("fileName",fileName);
+                metaList.put("fileType", fileName.substring(fileName.lastIndexOf(".")+1));
+                metaList.put("author", createMan);
+                metaList.put("date", String.valueOf(Utils.formateDate(0)));
+                //group1/M00/00/00/CgqyYl0CLD2AHkiHABaE6B6DRK0737.jpg
+                String fid = FastDFSClient.uploadFile(file, file.getName(), metaList);
+                if(!Utils.IsNull(fid)){
+                    //保存信息到jobtask
+                    String dateDir= Utils.formateDate(6);
+                    saveMap.put("fileid", fid);
+                    saveMap.put("operator_type", operator_type);
+                    saveMap.put("filename", dateDir + File.separator + fileName + ".xlsx");
+                    saveMap.put("operator_content", "导出成功，详情请下载excel");
+                    saveMap.put("addman", createMan);
+                    saveMap.put("addtime", Utils.formateDate(2));
+                    saveJobtask(saveMap);
+                    saveMap.clear();
+                    //删除本地文件
+                    file.delete();
+                }else {
+                    saveMap.put("fileid", "");
+                    saveMap.put("operator_type", operator_type);
+                    saveMap.put("filename", "errorFile");
+                    saveMap.put("operator_content", "出现异常,联系技术人员");
+                    saveMap.put("addman", createMan);
+                    saveMap.put("addtime", Utils.formateDate(2));
+                    saveJobtask(saveMap);
+                    saveMap.clear();
+                }
+            }else {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             map.clear();
-            return false;
         }finally {
             dataList.clear();
             titileMap.clear();
         }
+        return true;
     }
 
+
+    /**
+     *
+     *********************************************************.<br>
+     * [方法] saveJobtask <br>
+     * [描述] 保存到jobtask<br>
+     * [参数]  * @param null(对参数的描述) <br>
+     * [返回]  <br>
+     * [日期] 2019/12/9
+     * [时间] 10:05
+     * [作者] wuhaotai
+     *********************************************************.<br>
+     */
+    private void saveJobtask(Map map) throws IOException {
+        try(SqlSession session = MySqlSession.getSqlSession()) {
+            UserDao userDao = session.getMapper(UserDao.class);
+            userDao.saveJobTask(map);
+        }
+    }
     /**
      *
      *********************************************************.<br>
