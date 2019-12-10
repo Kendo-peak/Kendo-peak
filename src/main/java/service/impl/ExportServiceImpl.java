@@ -51,7 +51,7 @@ public class ExportServiceImpl implements ExportService {
             //生成文件名
             String fileName=createFileName(reqList);
             //创建人
-            String createMan=String.valueOf(map.get("createMan"));
+            String createMan=String.valueOf(map.get("creatMan"));
             //操作类型
             String operator_type=String.valueOf(map.get("operator_type"));
             //根据数据生成excel文件
