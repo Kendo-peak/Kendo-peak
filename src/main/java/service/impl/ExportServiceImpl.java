@@ -39,7 +39,7 @@ public class ExportServiceImpl implements ExportService {
      *********************************************************.<br>
      */
     @Override
-    public boolean increaseExcel(List<LinkedHashMap<String,String>> reqList){
+    public void increaseExcel(List<LinkedHashMap<String,String>> reqList){
         Map<String,Object> map = (Map)reqList.get(0);
         List<Map<String,Object>> dataList=null;
         LinkedHashMap<String, String> titileMap=null;
@@ -92,8 +92,6 @@ public class ExportServiceImpl implements ExportService {
                     saveJobtask(saveMap);
                     saveMap.clear();
                 }
-            }else {
-                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +100,6 @@ public class ExportServiceImpl implements ExportService {
             dataList.clear();
             titileMap.clear();
         }
-        return true;
     }
 
 

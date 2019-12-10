@@ -102,23 +102,34 @@ public class ExportExcel {
         sheetName = (String) workBookMap.get("sheetName");
         int counter = (int)workBookMap.get("counter");
         Map<String, CellStyle> styles = createStyles(workBook);
-        //分割数据（按单sheet页支持最大数据分割）
-        List<List<Map<String, Object>>> partition = Lists.partition(data, sheetDataLength);
-        //循环分割之后的List(一次循环产生一个List)
-        for(int i = 0; i < partition.size(); i++){
-            List<Map<String, Object>> dataList = partition.get(i);
-            //获取Sheet页名称
-            String currentSheetName = getCurrentSheetName(sheetName, counter, i);
+        if (data.size() == 0) {
+            String currentSheetName = getCurrentSheetName(sheetName, 0,0);
             //获取Sheet页
             Sheet sheet = createSheet(workBook, currentSheetName);
             //创建表头
             createHeadRow(sheet, titleMap, styles.get("titleStyle"));
-            //创建数据
-            createDataRow(sheet, dataList, titleMap, styles.get("dataStyle"));
-            workBookMap.put("counter", counter + i);
+            workBookMap.put("counter", 0);
+        }else {
+            //分割数据（按单sheet页支持最大数据分割）
+            List<List<Map<String, Object>>> partition = Lists.partition(data, sheetDataLength);
+            //循环分割之后的List(一次循环产生一个List)
+            for(int i = 0; i < partition.size(); i++){
+                List<Map<String, Object>> dataList = partition.get(i);
+                //获取Sheet页名称
+                String currentSheetName = getCurrentSheetName(sheetName, counter, i);
+                //获取Sheet页
+                Sheet sheet = createSheet(workBook, currentSheetName);
+                //创建表头
+                createHeadRow(sheet, titleMap, styles.get("titleStyle"));
+                //创建数据
+                createDataRow(sheet, dataList, titleMap, styles.get("dataStyle"));
+                workBookMap.put("counter", counter + i);
+            }
         }
         return workBookMap;
     }
+
+
 
     /**
      * 获取List格式的导出的Workbook

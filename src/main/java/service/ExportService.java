@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface ExportService {
     //生成表文件
-    public boolean increaseExcel(List<LinkedHashMap<String,String>> reqList) throws Exception;
+    public void increaseExcel(List<LinkedHashMap<String,String>> reqList) throws Exception;
 }
