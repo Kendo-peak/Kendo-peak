@@ -796,7 +796,7 @@ public class Utils {
     /**
      * String null 转 ""
      *
-     * @param obj
+     * @param
      * @return boolean
      */
     public static String castStringNullToEmpty(String value) {

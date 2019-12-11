@@ -368,10 +368,16 @@ public class ExportExcel {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue(Double.parseDouble(String.valueOf(value)));
         }else{
+            if (Utils.IsNull(value)){
+                cell.setCellType(CellType.STRING);
+                cell.setCellValue(Utils.castStringNullToEmpty("暂无"));
+            }else {
             //当数据为非数字类型
             cell.setCellType(CellType.STRING);
             cell.setCellValue(Utils.castStringNullToEmpty(String.valueOf(value)));
+            }
         }
+
         //风格
         if(cellStyle != null){
             cell.setCellStyle(cellStyle);
